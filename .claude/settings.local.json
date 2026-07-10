@@ -8,7 +8,8 @@
       "PowerShell(python -m venv .venv)",
       "PowerShell(.\\\\.venv\\\\Scripts\\\\python.exe -m pip install --quiet pandas numpy yfinance jpholiday pytest requests)",
       "PowerShell(.\\\\.venv\\\\Scripts\\\\python.exe -c \"import pandas, numpy, yfinance, jpholiday; print\\('ok'\\)\")",
-      "PowerShell(git add -A)"
+      "PowerShell(git add -A)",
+      "Bash(python -)"
     ]
   }
 }

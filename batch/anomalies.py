@@ -63,7 +63,7 @@ def moon_age(d: date) -> float:
 
 def moon_phase(d: date) -> str | None:
     age = moon_age(d)
-    if age < 1.0 or age > 28.53:
+    if age < 0.5 or age > 29.03:
         return "新月"
     if abs(age - 14.765) < 0.5:
         return "満月"
