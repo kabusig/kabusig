@@ -1,19 +1,10 @@
 import Link from "next/link";
-import { getDb } from "@/lib/db";
+import { newsList, newsSources } from "@/lib/data";
 import AdSlot from "@/components/AdSlot";
 
 export const dynamic = "force-dynamic";
 
-type NewsLink = {
-  id: number;
-  title: string;
-  url: string;
-  source_name: string;
-  published_at: string | null;
-  tags: string | null;
-};
-
-const TAGS = ["決算", "金融政策", "市況", "為替", "経済指標", "企業"];
+const TAGS = ["話題", "決算", "金融政策", "市況", "為替", "経済指標", "企業"];
 
 function fmtDate(iso: string | null): string {
   if (!iso) return "";
@@ -27,22 +18,9 @@ export default async function NewsPage({
   searchParams: Promise<{ tag?: string; source?: string }>;
 }) {
   const { tag = "", source = "" } = await searchParams;
-  const db = getDb();
-
-  const sources = (
-    db
-      .prepare("select distinct source_name from news_links order by source_name")
-      .all() as unknown as { source_name: string }[]
-  ).map((r) => ({ ...r }));
-
   // 要約・論評は行わない。タイトル+媒体名+公開日時+外部リンクのみ(指示書§9)
-  let rows = db
-    .prepare(
-      "select id, title, url, source_name, published_at, tags from news_links " +
-        "order by published_at desc, id desc limit 300"
-    )
-    .all() as unknown as NewsLink[];
-  rows = rows.map((r) => ({ ...r }));
+  const sources = (await newsSources()).map((source_name) => ({ source_name }));
+  const rows = await newsList(300);
 
   const links = rows.filter((n) => {
     if (source && n.source_name !== source) return false;

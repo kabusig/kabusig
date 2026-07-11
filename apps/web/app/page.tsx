@@ -7,9 +7,10 @@ import {
   recentCalendarEvents,
   recentNews,
   listSignalTypes,
-} from "@/lib/db";
+} from "@/lib/data";
 import { ANOMALY_NOTE } from "@/lib/constants";
 import SignalEventTable from "@/components/SignalEventTable";
+import { getViewer } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -19,14 +20,15 @@ function fmtTime(iso: string | null): string {
   return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
-export default function Dashboard() {
-  const events = recentSignalEvents(15);
-  const resultEvents = recentSignalEventsWithResult(15);
-  const calendar = recentCalendarEvents(4);
-  const news = recentNews(9);
-  const stockCount = countStocks();
-  const signalCount = listSignalTypes().length;
-  const { date: latestDate, count: todayCount } = latestSignalStats();
+export default async function Dashboard() {
+  const viewer = await getViewer();
+  const events = await recentSignalEvents(viewer.paid ? 15 : 5);
+  const resultEvents = viewer.paid ? await recentSignalEventsWithResult(15) : [];
+  const calendar = await recentCalendarEvents(4);
+  const news = await recentNews(9);
+  const stockCount = await countStocks();
+  const signalCount = (await listSignalTypes()).length;
+  const { date: latestDate, count: todayCount } = await latestSignalStats();
 
   return (
     <div className="space-y-16">
@@ -120,6 +122,23 @@ export default function Dashboard() {
         </div>
         <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
           <SignalEventTable events={events} />
+          {!viewer.paid && (
+            <div className="mt-4 rounded-xl bg-gradient-to-br from-[#f5f5f7] to-[#e8f2ff] p-6 text-center">
+              <p className="text-sm font-medium">
+                本日の検知 {todayCount.toLocaleString()} 件のうち 5
+                件を表示しています
+              </p>
+              <p className="text-xs text-[#6e6e73] mt-1">
+                プレミアム会員はすべての検知・1〜3営業日後の実績・シグナル統計を閲覧できます。
+              </p>
+              <Link
+                href="/pricing"
+                className="inline-block mt-3 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-6 py-2.5 text-sm font-medium transition-colors"
+              >
+                プレミアムでできることを見る
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 

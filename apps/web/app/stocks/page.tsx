@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { countStocks, searchStocks } from "@/lib/db";
+import { countStocks, searchStocks } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
@@ -9,8 +9,8 @@ export default async function StocksPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q = "" } = await searchParams;
-  const total = countStocks();
-  const stocks = searchStocks(q, 200); // 証券コード順(中立的順序)
+  const total = await countStocks();
+  const stocks = await searchStocks(q, 200); // 証券コード順(中立的順序)
 
   return (
     <div className="space-y-8">

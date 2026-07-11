@@ -54,15 +54,38 @@ create table signal_types (
   is_premium boolean default false
 );
 
--- シグナル検知履歴
+-- シグナル検知履歴(return_* は検知日終値→N営業日後終値の実績)
 create table signal_events (
   id bigint generated always as identity primary key,
   code text references stocks,
   signal_type text references signal_types,
   date date not null,
   detail jsonb,
+  return_1d_pct numeric, return_1d_yen numeric,
+  return_2d_pct numeric, return_2d_yen numeric,
+  return_3d_pct numeric, return_3d_yen numeric,
   created_at timestamptz default now(),
   unique (code, signal_type, date)
+);
+create index idx_signal_events_date on signal_events (date desc);
+create index idx_signal_events_code on signal_events (code, date desc);
+
+-- シグナル別過去統計(バッチが事前計算)
+create table signal_stats (
+  signal_type text references signal_types,
+  hold_days integer,
+  count integer,
+  up_count integer,
+  down_count integer,
+  up_ratio_pct numeric,
+  mean_return_pct numeric,
+  median_return_pct numeric,
+  max_gain_pct numeric,
+  max_loss_pct numeric,
+  histogram jsonb,
+  recent_occurrences jsonb,
+  updated_at timestamptz default now(),
+  primary key (signal_type, hold_days)
 );
 
 -- 相場の暦・アノマリーイベント(市場全体、銘柄非依存)
@@ -117,9 +140,10 @@ create table news_links (
   url text not null unique,
   source_name text not null,
   published_at timestamptz,
-  tags text[],
+  tags jsonb default '[]',
   created_at timestamptz default now()
 );
+create index idx_news_published on news_links (published_at desc);
 
 -- Row Level Security
 alter table profiles enable row level security;
@@ -128,6 +152,7 @@ alter table daily_prices enable row level security;
 alter table daily_indicators enable row level security;
 alter table signal_types enable row level security;
 alter table signal_events enable row level security;
+alter table signal_stats enable row level security;
 alter table calendar_events enable row level security;
 alter table earnings_schedule enable row level security;
 alter table watchlists enable row level security;
@@ -152,6 +177,7 @@ create policy "public read prices" on daily_prices for select using (true);
 create policy "public read indicators" on daily_indicators for select using (true);
 create policy "public read signal_types" on signal_types for select using (true);
 create policy "public read signal_events" on signal_events for select using (true);
+create policy "public read signal_stats" on signal_stats for select using (true);
 create policy "public read calendar" on calendar_events for select using (true);
 create policy "public read earnings" on earnings_schedule for select using (true);
 create policy "public read news" on news_links for select using (true);

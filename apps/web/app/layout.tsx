@@ -34,7 +34,7 @@ export default function RootLayout({
             >
               {SERVICE_NAME}
             </Link>
-            <nav className="flex gap-6 text-xs text-[#424245]">
+            <nav className="flex gap-6 text-xs text-[#424245] flex-1">
               {NAV.map((n) => (
                 <Link
                   key={n.href}
@@ -45,6 +45,12 @@ export default function RootLayout({
                 </Link>
               ))}
             </nav>
+            <Link
+              href="/account"
+              className="text-xs text-[#424245] hover:text-black whitespace-nowrap"
+            >
+              アカウント
+            </Link>
           </div>
         </header>
         <main className="max-w-6xl mx-auto px-6 py-12 w-full flex-1">

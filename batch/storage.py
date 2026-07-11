@@ -73,6 +73,10 @@ create table if not exists signal_stats (
   up_ratio_pct real,
   mean_return_pct real,
   median_return_pct real,
+  max_gain_pct real,
+  max_loss_pct real,
+  histogram text,          -- 分布ヒストグラム(JSON)
+  recent_occurrences text, -- 直近発生20件(JSON)
   updated_at text default (datetime('now')),
   primary key (signal_type, hold_days)
 );
@@ -127,6 +131,10 @@ class SqliteStorage:
             "alter table signal_events add column return_2d_yen real",
             "alter table signal_events add column return_3d_pct real",
             "alter table signal_events add column return_3d_yen real",
+            "alter table signal_stats add column max_gain_pct real",
+            "alter table signal_stats add column max_loss_pct real",
+            "alter table signal_stats add column histogram text",
+            "alter table signal_stats add column recent_occurrences text",
         ):
             try:
                 self.conn.execute(ddl)

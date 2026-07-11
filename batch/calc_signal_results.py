@@ -11,12 +11,31 @@ usage: python calc_signal_results.py
 """
 from __future__ import annotations
 
+import json
 from statistics import median
 
 from storage import get_storage
 
 HOLD_DAYS = [1, 2, 3, 5, 20]
 RESULT_DAYS = [1, 2, 3]  # signal_events に個別記録する日数
+
+
+def build_histogram(vals: list[float]) -> list[dict]:
+    """-10%〜+10%を2%刻み+両端オープンのヒストグラム。"""
+    buckets = []
+    for lo in range(-10, 10, 2):
+        hi = lo + 2
+        if lo == -10:
+            n = sum(1 for v in vals if v < hi)
+            label = f"<{hi}%"
+        elif hi == 10:
+            n = sum(1 for v in vals if v >= lo)
+            label = f"{lo}%+"
+        else:
+            n = sum(1 for v in vals if lo <= v < hi)
+            label = f"{lo}〜{hi}%"
+        buckets.append({"bucket": label, "count": n})
+    return buckets
 
 
 def main():
@@ -29,9 +48,12 @@ def main():
     ).fetchall()
     print(f"events: {len(events)}")
 
+    names = dict(conn.execute("select code, name from stocks").fetchall())
+
     # 銘柄ごとに終値系列をロードして日付→位置を引けるようにする
     updates: dict[int, list[tuple[float, float, int]]] = {d: [] for d in RESULT_DAYS}
     stats: dict[tuple[str, int], list[float]] = {}
+    occurrences: dict[tuple[str, int], list[dict]] = {}
     cur_code, closes, pos_by_date = None, [], {}
 
     for ev_id, code, signal_type, date, r1, r2, r3 in events:
@@ -52,6 +74,10 @@ def main():
             if pos + h < len(closes) and closes[pos + h] is not None:
                 pct = (closes[pos + h] - base) / base * 100
                 stats.setdefault((signal_type, h), []).append(pct)
+                occurrences.setdefault((signal_type, h), []).append({
+                    "code": code, "name": names.get(code, ""),
+                    "date": date, "return_pct": round(pct, 3),
+                })
         # 1/2/3営業日後の実績を signal_events に記録(未記録のもののみ)
         existing = {1: r1, 2: r2, 3: r3}
         for d in RESULT_DAYS:
@@ -70,18 +96,23 @@ def main():
             )
         print(f"updated {d}d results: {len(updates[d])}")
 
-    # 統計テーブルを全面再構築
+    # 統計テーブルを全面再構築(分布・直近発生・最大値込み)
     conn.execute("delete from signal_stats")
     for (signal_type, h), vals in sorted(stats.items()):
         n = len(vals)
         up = sum(1 for v in vals if v > 0)
+        occ = sorted(occurrences[(signal_type, h)],
+                     key=lambda o: o["date"], reverse=True)[:20]
         conn.execute(
             "insert into signal_stats(signal_type, hold_days, count, up_count, "
-            "down_count, up_ratio_pct, mean_return_pct, median_return_pct) "
-            "values(?,?,?,?,?,?,?,?)",
+            "down_count, up_ratio_pct, mean_return_pct, median_return_pct, "
+            "max_gain_pct, max_loss_pct, histogram, recent_occurrences) "
+            "values(?,?,?,?,?,?,?,?,?,?,?,?)",
             (signal_type, h, n, up, sum(1 for v in vals if v < 0),
              round(up / n * 100, 2), round(sum(vals) / n, 4),
-             round(median(vals), 4)),
+             round(median(vals), 4), round(max(vals), 3), round(min(vals), 3),
+             json.dumps(build_histogram(vals), ensure_ascii=False),
+             json.dumps(occ, ensure_ascii=False)),
         )
     conn.commit()
     print(f"signal_stats rebuilt: {len(stats)} rows")

@@ -1,10 +1,10 @@
-import { recentCalendarEvents } from "@/lib/db";
+import { recentCalendarEvents } from "@/lib/data";
 import { ANOMALY_NOTE } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
-export default function CalendarPage() {
-  const events = recentCalendarEvents(60);
+export default async function CalendarPage() {
+  const events = await recentCalendarEvents(60);
 
   return (
     <div className="space-y-10">

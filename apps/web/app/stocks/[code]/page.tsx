@@ -4,9 +4,11 @@ import {
   getPrices,
   getIndicators,
   recentSignalEvents,
-} from "@/lib/db";
+} from "@/lib/data";
 import PriceChart from "@/components/PriceChart";
 import SignalEventTable from "@/components/SignalEventTable";
+import Paywall from "@/components/Paywall";
+import { getViewer } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -16,12 +18,16 @@ export default async function StockDetail({
   params: Promise<{ code: string }>;
 }) {
   const { code } = await params;
-  const stock = getStock(code);
+  const viewer = await getViewer();
+  if (!viewer.paid) {
+    return <Paywall feature="銘柄詳細" />;
+  }
+  const stock = await getStock(code);
   if (!stock) notFound();
 
-  const prices = getPrices(code, 250);
-  const indicators = getIndicators(code, 250);
-  const events = recentSignalEvents(50, code);
+  const prices = await getPrices(code, 250);
+  const indicators = await getIndicators(code, 250);
+  const events = await recentSignalEvents(50, code);
   const latest = prices[prices.length - 1];
   const latestInd = indicators[indicators.length - 1];
   const prev = prices[prices.length - 2];

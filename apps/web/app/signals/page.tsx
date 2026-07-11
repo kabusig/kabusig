@@ -1,4 +1,4 @@
-import { listSignalTypes } from "@/lib/db";
+import { listSignalTypes } from "@/lib/data";
 import { CATEGORY_LABELS } from "@/lib/constants";
 import CategoryBadge from "@/components/CategoryBadge";
 
@@ -6,8 +6,8 @@ export const dynamic = "force-dynamic";
 
 const CATEGORY_ORDER = ["classic", "sakata", "legend", "anomaly"];
 
-export default function SignalsPage() {
-  const types = listSignalTypes();
+export default async function SignalsPage() {
+  const types = await listSignalTypes();
   const categories = CATEGORY_ORDER.filter((c) =>
     types.some((t) => t.category === c)
   );

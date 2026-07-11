@@ -65,17 +65,48 @@ def push_line(user_id: str, text: str, max_retry: int = 3) -> bool:
     return False
 
 
+def notify_members(storage, events: list[dict]) -> None:
+    """フェーズ2: Supabase上の有料会員へ、監視銘柄×通知設定で絞って送信。"""
+    from supabase_client import SupabaseClient
+    sb = SupabaseClient()
+    users = sb.select(
+        "profiles", "select=id,line_user_id&plan=eq.paid&line_user_id=not.is.null")
+    print(f"paid members with LINE: {len(users)}")
+    for u in users:
+        watch = {w["code"] for w in sb.select(
+            "watchlists", f"select=code&user_id=eq.{u['id']}")}
+        disabled = {s["signal_type"] for s in sb.select(
+            "notification_settings",
+            f"select=signal_type&user_id=eq.{u['id']}&enabled=eq.false")}
+        sent = 0
+        for ev in events:
+            if ev["code"] not in watch or ev["signal_type"] in disabled:
+                continue
+            if not storage.log_notification(u["id"], ev["id"]):
+                continue  # 送信済み(冪等)
+            if push_line(u["line_user_id"], build_signal_message(ev)):
+                sent += 1
+        if sent:
+            print(f"  {u['id'][:8]}...: {sent} sent")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--date", default=date.today().strftime("%Y-%m-%d"))
     parser.add_argument("--digest", action="store_true",
                         help="当日分を1通にまとめて送信(まとめ通知設定)")
+    parser.add_argument("--members", action="store_true",
+                        help="Supabase上の有料会員へ監視銘柄ベースで送信(フェーズ2)")
     args = parser.parse_args()
 
     storage = get_storage()
     events = storage.get_signal_events(on_date=args.date)
     if not events:
         print(f"no signal events on {args.date}")
+        return
+
+    if args.members:
+        notify_members(storage, events)
         return
 
     user_id = config.LINE_DEV_USER_ID or "dev-user"

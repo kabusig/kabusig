@@ -76,10 +76,14 @@ cd batch
 
 ## フェーズ計画
 
-- **フェーズ1(現在)**: ローカル SQLite + yfinance。自分用ツールとして完成
-- **フェーズ2**: Supabase 移行(`supabase/migrations`)+ J-Quants API + 認証 + 決算予定通知
-  - yfinance は非公式ライブラリのため、公開運用前に必ず J-Quants へ移行する
-- **フェーズ3**: Stripe 課金、閾値カスタマイズ、管理画面
+- **フェーズ1(完了)**: ローカル SQLite + yfinance。自分用ツールとして完成
+- **フェーズ2(コード実装済み)**: Supabase(DB/認証)+ Stripe(プレミアム980円/月)+
+  LINE連携 + J-Quants + Vercel/GitHub Actions 公開基盤
+  - **セットアップ手順: [docs/SETUP_PHASE2.md](docs/SETUP_PHASE2.md)**
+  - Supabase 未設定時は「開発モード」(ログイン不要・全機能・SQLite)で動作
+  - アーキテクチャ: バッチはSQLiteで計算 → `push_supabase.py` で配信用DBへ同期
+  - 公開範囲: ニュース/図鑑/暦/料金=誰でも、シグナル・統計・バックテスト・通知=プレミアム会員
+- **フェーズ3**: 閾値カスタマイズ、管理画面(通知数集計・ニュース手動登録)
 
 ## 法務(公開前チェックリスト)
 

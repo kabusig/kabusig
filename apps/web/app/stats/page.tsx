@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { getSignalStats } from "@/lib/db";
+import { getSignalStats } from "@/lib/data";
+import { getViewer } from "@/lib/auth";
+import Paywall from "@/components/Paywall";
 import { BACKTEST_NOTE } from "@/lib/constants";
 import CategoryBadge from "@/components/CategoryBadge";
 
@@ -17,12 +19,21 @@ export default async function StatsPage({
 }: {
   searchParams: Promise<{ hold?: string; sort?: string }>;
 }) {
+  const viewer = await getViewer();
+  if (!viewer.paid) {
+    return (
+      <div className="space-y-6">
+        <h1 className="text-4xl font-semibold tracking-tight">シグナル別 過去統計</h1>
+        <Paywall feature="シグナル統計" />
+      </div>
+    );
+  }
   const sp = await searchParams;
   const hold = HOLDS.includes(Number(sp.hold)) ? Number(sp.hold) : 3;
   const sort = (["count", "up_ratio", "mean"].includes(sp.sort ?? "")
     ? sp.sort
     : "count") as "count" | "up_ratio" | "mean";
-  const stats = getSignalStats(hold, sort);
+  const stats = await getSignalStats(hold, sort);
 
   const href = (h: number, s: string) => `/stats?hold=${h}&sort=${s}`;
 

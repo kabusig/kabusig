@@ -227,6 +227,42 @@ export function getSignalStats(
   );
 }
 
+export type SignalStatDetail = SignalStat & {
+  max_gain_pct: number | null;
+  max_loss_pct: number | null;
+  histogram: { bucket: string; count: number }[];
+  recent_occurrences: {
+    code: string;
+    name: string;
+    date: string;
+    return_pct: number;
+  }[];
+};
+
+export function getSignalStatDetail(
+  signalType: string,
+  holdDays: number
+): SignalStatDetail | null {
+  const row = getDb()
+    .prepare(
+      `select st.signal_type, t.name as signal_name, t.category,
+              st.hold_days, st.count, st.up_count, st.down_count,
+              st.up_ratio_pct, st.mean_return_pct, st.median_return_pct,
+              st.max_gain_pct, st.max_loss_pct, st.histogram, st.recent_occurrences
+       from signal_stats st join signal_types t on t.id = st.signal_type
+       where st.signal_type = ? and st.hold_days = ?`
+    )
+    .get(signalType, holdDays) as Record<string, unknown> | undefined;
+  if (!row) return null;
+  const r = { ...row } as SignalStatDetail & {
+    histogram: unknown;
+    recent_occurrences: unknown;
+  };
+  r.histogram = JSON.parse((row.histogram as string) ?? "[]");
+  r.recent_occurrences = JSON.parse((row.recent_occurrences as string) ?? "[]");
+  return r as SignalStatDetail;
+}
+
 export type NewsItem = {
   id: number;
   title: string;
@@ -235,6 +271,27 @@ export type NewsItem = {
   published_at: string | null;
   tags: string | null;
 };
+
+export function newsList(limit = 300): NewsItem[] {
+  return plain<NewsItem>(
+    getDb()
+      .prepare(
+        "select id, title, url, source_name, published_at, tags from news_links " +
+          "order by published_at desc, id desc limit ?"
+      )
+      .all(limit)
+  );
+}
+
+export function newsSources(): string[] {
+  return (
+    getDb()
+      .prepare(
+        "select distinct source_name from news_links order by source_name"
+      )
+      .all() as unknown as { source_name: string }[]
+  ).map((r) => r.source_name);
+}
 
 export function recentNews(limit = 10): NewsItem[] {
   const rows = plain<NewsItem>(
