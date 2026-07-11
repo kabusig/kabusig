@@ -6,9 +6,9 @@ export const dynamic = "force-static";
 
 export default function DisclaimerPage() {
   return (
-    <article className="prose prose-invert max-w-3xl space-y-4 text-sm leading-relaxed">
-      <h1 className="text-2xl font-bold">免責事項</h1>
-      <ol className="list-decimal pl-5 space-y-3 text-slate-300">
+    <article className="max-w-3xl space-y-4 text-sm leading-relaxed">
+      <h1 className="text-4xl font-semibold tracking-tight">免責事項</h1>
+      <ol className="list-decimal pl-5 space-y-3 text-[#424245]">
         <li>
           {SERVICE_NAME}
           (以下「本サービス」)は、金融商品取引法上の投資助言・代理業に該当する

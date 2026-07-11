@@ -103,11 +103,45 @@ def test_sanku_fumiage_three_gaps():
 
 
 def test_high_52w_detected():
-    closes = [1000.0] * 70 + [1100.0]
-    highs = [1005.0] * 70 + [1110.0]
+    # 52週高値は最低200営業日の履歴が必要
+    closes = [1000.0] * 210 + [1100.0]
+    highs = [1005.0] * 210 + [1110.0]
     df = make_ohlcv(closes, highs=highs)
     dates = _detect_dates("high_52w", df)
     assert dates and dates[-1] == df.index[-1]
+
+
+def test_high_52w_requires_history():
+    # 履歴200日未満では「52週高値」を検知しない
+    closes = [1000.0] * 70 + [1100.0]
+    highs = [1005.0] * 70 + [1110.0]
+    df = make_ohlcv(closes, highs=highs)
+    assert _detect_dates("high_52w", df) == []
+
+
+def test_no_lookahead_bias(rng):
+    """全シグナル: データを途中で打ち切っても、それ以前の検知結果が変わらない
+    (未来のデータを参照していない)ことを検証する。"""
+    n, cutoff = 320, 260
+    closes = 1000 * np.exp(np.cumsum(rng.normal(0, 0.02, n)))
+    opens = closes * (1 + rng.normal(0, 0.005, n))
+    highs = np.maximum(opens, closes) * (1 + abs(rng.normal(0, 0.008, n)))
+    lows = np.minimum(opens, closes) * (1 - abs(rng.normal(0, 0.008, n)))
+    vols = rng.integers(500_000, 5_000_000, n).astype(float)
+    df_full = make_ohlcv(closes, opens=opens, highs=highs, lows=lows, volumes=vols)
+    df_cut = df_full.iloc[:cutoff]
+    cutoff_date = df_cut.index[-1]
+
+    full_ind = indicators.compute_all(df_full)
+    cut_ind = indicators.compute_all(df_cut)
+    for sig in ALL_SIGNALS:
+        full_events = {e["date"] for e in sig.detect(full_ind)
+                       if e["date"] <= cutoff_date}
+        cut_events = {e["date"] for e in sig.detect(cut_ind)}
+        assert full_events == cut_events, (
+            f"{sig.id}: 先読みバイアスの疑い "
+            f"(full-only={sorted(full_events - cut_events)}, "
+            f"cut-only={sorted(cut_events - full_events)})")
 
 
 def test_all_signals_run_without_error(rng):

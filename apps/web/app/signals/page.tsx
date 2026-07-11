@@ -4,24 +4,29 @@ import CategoryBadge from "@/components/CategoryBadge";
 
 export const dynamic = "force-dynamic";
 
+const CATEGORY_ORDER = ["classic", "sakata", "legend", "anomaly"];
+
 export default function SignalsPage() {
   const types = listSignalTypes();
-  const categories = [...new Set(types.map((t) => t.category))];
+  const categories = CATEGORY_ORDER.filter((c) =>
+    types.some((t) => t.category === c)
+  );
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold">シグナル図鑑</h1>
-        <p className="text-sm text-slate-400 mt-1">
-          本サービスが機械的に検知する「指標の状態」の定義一覧です。
-          各シグナルは状態・形状の検知であり、売買の方向を示すものではありません。
+    <div className="space-y-12">
+      <div className="max-w-2xl">
+        <h1 className="text-4xl font-semibold tracking-tight">
+          シグナル図鑑
+        </h1>
+        <p className="text-[15px] text-[#6e6e73] mt-3 leading-relaxed">
+          本サービスが機械的に検知する「指標の状態」全{types.length}
+          種の定義一覧です。各シグナルは状態・形状の検知であり、売買の方向を示すものではありません。
         </p>
       </div>
       {categories.map((cat) => (
         <section key={cat}>
-          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <CategoryBadge category={cat} />
-            <span>{CATEGORY_LABELS[cat] ?? cat}</span>
+          <h2 className="text-2xl font-semibold tracking-tight mb-5">
+            {CATEGORY_LABELS[cat] ?? cat}
           </h2>
           <div className="grid md:grid-cols-2 gap-3">
             {types
@@ -29,22 +34,27 @@ export default function SignalsPage() {
               .map((t) => (
                 <div
                   key={t.id}
-                  className="rounded-lg border border-slate-800 p-4 space-y-1"
+                  className="bg-white rounded-2xl border border-black/5 shadow-sm p-6 space-y-2"
                 >
-                  <div className="font-semibold">
-                    {t.name}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-semibold text-[15px]">{t.name}</span>
+                    <CategoryBadge category={t.category} />
                     {t.is_premium ? (
-                      <span className="ml-2 text-xs text-amber-400 border border-amber-800 rounded px-1.5 py-0.5">
+                      <span className="text-[11px] text-[#b25000] bg-[#fff3e0] rounded-full px-2.5 py-0.5 font-medium">
                         有料プラン
                       </span>
                     ) : (
-                      <span className="ml-2 text-xs text-slate-400 border border-slate-700 rounded px-1.5 py-0.5">
+                      <span className="text-[11px] text-[#6e6e73] bg-[#f5f5f7] rounded-full px-2.5 py-0.5 font-medium">
                         無料
                       </span>
                     )}
                   </div>
-                  <p className="text-sm text-slate-300">{t.description}</p>
-                  <p className="text-xs text-slate-500">{t.origin}</p>
+                  <p className="text-sm text-[#424245] leading-relaxed">
+                    {t.description}
+                  </p>
+                  <p className="text-xs text-[#6e6e73] leading-relaxed">
+                    {t.origin}
+                  </p>
                 </div>
               ))}
           </div>

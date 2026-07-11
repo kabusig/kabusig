@@ -6,11 +6,11 @@ export const dynamic = "force-static";
 
 export default function TermsPage() {
   return (
-    <article className="max-w-3xl space-y-5 text-sm leading-relaxed text-slate-300">
-      <h1 className="text-2xl font-bold text-white">利用規約</h1>
+    <article className="max-w-3xl space-y-5 text-sm leading-relaxed text-[#424245]">
+      <h1 className="text-4xl font-semibold tracking-tight text-[#1d1d1f]">利用規約</h1>
 
       <section>
-        <h2 className="font-semibold text-white mb-1">第1条(定義・適用範囲)</h2>
+        <h2 className="font-semibold text-[#1d1d1f] mb-1">第1条(定義・適用範囲)</h2>
         <p>
           本規約は、{OPERATOR_NAME}(以下「運営者」)が提供する{SERVICE_NAME}
           (以下「本サービス」)の利用条件を定めるものであり、本サービスを利用する
@@ -19,7 +19,7 @@ export default function TermsPage() {
       </section>
 
       <section>
-        <h2 className="font-semibold text-white mb-1">第2条(アカウント)</h2>
+        <h2 className="font-semibold text-[#1d1d1f] mb-1">第2条(アカウント)</h2>
         <p>
           利用者は正確な情報をもって登録を行うものとし、アカウントを第三者に
           譲渡・貸与してはなりません。認証情報の管理責任は利用者が負います。
@@ -27,7 +27,7 @@ export default function TermsPage() {
       </section>
 
       <section>
-        <h2 className="font-semibold text-white mb-1">第3条(有料プラン)</h2>
+        <h2 className="font-semibold text-[#1d1d1f] mb-1">第3条(有料プラン)</h2>
         <p>
           有料プランの料金は料金プランページに表示します。支払方法はクレジット
           カード(Stripe)とし、申込日に初回課金、以後毎月同日に自動課金されます。
@@ -37,7 +37,7 @@ export default function TermsPage() {
       </section>
 
       <section>
-        <h2 className="font-semibold text-white mb-1">第4条(禁止事項)</h2>
+        <h2 className="font-semibold text-[#1d1d1f] mb-1">第4条(禁止事項)</h2>
         <ul className="list-disc pl-5 space-y-1">
           <li>スクレイピング等の自動化された手段によるデータ取得</li>
           <li>リバースエンジニアリング、本サービスの複製・再配布</li>
@@ -48,7 +48,7 @@ export default function TermsPage() {
       </section>
 
       <section>
-        <h2 className="font-semibold text-white mb-1">第5条(免責)</h2>
+        <h2 className="font-semibold text-[#1d1d1f] mb-1">第5条(免責)</h2>
         <p>
           本サービスは投資助言・代理業に該当する行為を行いません。提供情報は
           機械的計算結果および公開情報であり、その正確性・完全性・有用性を保証
@@ -58,14 +58,14 @@ export default function TermsPage() {
       </section>
 
       <section>
-        <h2 className="font-semibold text-white mb-1">第6条(知的財産権)</h2>
+        <h2 className="font-semibold text-[#1d1d1f] mb-1">第6条(知的財産権)</h2>
         <p>
           本サービスに関する知的財産権は運営者または正当な権利者に帰属します。
         </p>
       </section>
 
       <section>
-        <h2 className="font-semibold text-white mb-1">第7条(規約の変更)</h2>
+        <h2 className="font-semibold text-[#1d1d1f] mb-1">第7条(規約の変更)</h2>
         <p>
           運営者は、必要と判断した場合、本サービス上での掲示その他適切な方法で
           周知のうえ本規約を変更できます。変更後の規約は掲示の際に定める効力
@@ -74,7 +74,7 @@ export default function TermsPage() {
       </section>
 
       <section>
-        <h2 className="font-semibold text-white mb-1">第8条(準拠法・管轄)</h2>
+        <h2 className="font-semibold text-[#1d1d1f] mb-1">第8条(準拠法・管轄)</h2>
         <p>
           本規約は日本法に準拠し、本サービスに関する紛争は運営者所在地を管轄する
           地方裁判所を第一審の専属的合意管轄裁判所とします。

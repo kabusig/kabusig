@@ -14,7 +14,12 @@ export type BacktestResult = {
   maxGainPct: number;
   maxLossPct: number;
   histogram: { bucket: string; count: number }[];
-  occurrences: { code: string; date: string; returnPct: number }[];
+  occurrences: {
+    code: string;
+    stockName: string;
+    date: string;
+    returnPct: number;
+  }[];
 };
 
 export function runBacktest(
@@ -23,11 +28,15 @@ export function runBacktest(
   sinceMonths?: number
 ): BacktestResult | null {
   const db = getDb();
-  let sql =
-    "select code, date from signal_events where signal_type = ? order by date";
-  const rows = db.prepare(sql).all(signalType) as unknown as {
+  const rows = db
+    .prepare(
+      "select e.code, e.date, s.name as stock_name from signal_events e " +
+        "join stocks s on s.code = e.code where e.signal_type = ? order by e.date"
+    )
+    .all(signalType) as unknown as {
     code: string;
     date: string;
+    stock_name: string;
   }[];
 
   const since = sinceMonths
@@ -37,7 +46,12 @@ export function runBacktest(
     : null;
 
   const pricesCache = new Map<string, PriceRow[]>();
-  const returns: { code: string; date: string; returnPct: number }[] = [];
+  const returns: {
+    code: string;
+    stockName: string;
+    date: string;
+    returnPct: number;
+  }[] = [];
 
   for (const ev of rows) {
     if (since && ev.date < since) continue;
@@ -55,6 +69,7 @@ export function runBacktest(
     if (entry <= 0) continue;
     returns.push({
       code: ev.code,
+      stockName: ev.stock_name,
       date: ev.date,
       returnPct: ((exit - entry) / entry) * 100,
     });

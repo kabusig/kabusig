@@ -32,15 +32,15 @@ const ROWS: [string, string][] = [
 export default function TokushohoPage() {
   return (
     <article className="max-w-3xl space-y-4 text-sm leading-relaxed">
-      <h1 className="text-2xl font-bold">特定商取引法に基づく表記</h1>
+      <h1 className="text-4xl font-semibold tracking-tight">特定商取引法に基づく表記</h1>
       <table className="w-full">
         <tbody>
           {ROWS.map(([label, value]) => (
-            <tr key={label} className="border-b border-slate-800">
-              <th className="py-3 pr-4 text-left text-slate-400 w-48 align-top whitespace-nowrap">
+            <tr key={label} className="border-b border-black/10">
+              <th className="py-3 pr-4 text-left text-[#6e6e73] w-48 align-top whitespace-nowrap">
                 {label}
               </th>
-              <td className="py-3 text-slate-300">{value}</td>
+              <td className="py-3 text-[#424245]">{value}</td>
             </tr>
           ))}
         </tbody>

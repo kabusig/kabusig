@@ -25,6 +25,11 @@ data/             ローカル SQLite(フェーズ1、git管理外)
 
 シグナル名・説明文はすべて「状態の記述」であり、売買の方向を示す表現は使いません(CI の禁止ワードテストで機械的に担保)。アノマリーは「言い伝えの紹介」として提示し、統計的検証はバックテスト機能で行います。
 
+## 監視対象
+
+**東証プライム全銘柄(約1,550)**。銘柄マスタは JPX 公式の上場銘柄一覧から
+`fetch_stocklist.py` で自動生成する(証券コード順の中立的順序で表示)。
+
 ## セットアップ(フェーズ1: ローカル)
 
 ```powershell
@@ -32,20 +37,30 @@ data/             ローカル SQLite(フェーズ1、git管理外)
 python -m venv .venv
 .venv\Scripts\pip install -r batch\requirements.txt
 
-# 2. データ取得 → 指標計算 → シグナル検知(初回はバックフィル)
+# 2. 銘柄マスタ → データ取得 → 指標計算 → シグナル検知(初回はバックフィル)
 cd batch
-..\.venv\Scripts\python fetch_prices.py --period 2y
+..\.venv\Scripts\python fetch_stocklist.py
+..\.venv\Scripts\python fetch_prices.py --bulk --period 2y
 ..\.venv\Scripts\python calc_indicators.py
 ..\.venv\Scripts\python detect_signals.py --backfill
 
-# 3. 通知テスト(トークン未設定なら dry-run で標準出力)
+# 3. ニュース収集(公式RSSのみ・リンクのみ保存)
+..\.venv\Scripts\python fetch_news.py
+
+# 4. 通知テスト(トークン未設定なら dry-run で標準出力)
 ..\.venv\Scripts\python send_notifications.py --digest
 
-# 4. Web アプリ
+# 5. Web アプリ
 cd ..\apps\web
 npm install
 npm run dev   # http://localhost:3000
 ```
+
+## 収益化(ニュースまとめ)
+
+`/news` は経済メディアの公式RSSを自動集約したまとめページ。広告・アフィリエイトは
+`apps/web/components/AdSlot.tsx` の `AD_SLOTS` にタグを設定すると表示される
+(金融系アフィリエイトでも、特定商品を勧める文言は書かないこと)。
 
 ## テスト
 

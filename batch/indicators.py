@@ -96,6 +96,6 @@ def compute_all(df: pd.DataFrame) -> pd.DataFrame:
     out["kairi25"] = kairi(c, 25)
     out["atr14"] = atr(h, l, c)
     out["tenkan"], out["kijun"], out["senkou_a"], out["senkou_b"] = ichimoku(h, l)
-    out["high_52w"] = h.rolling(250, min_periods=60).max()
-    out["low_52w"] = l.rolling(250, min_periods=60).min()
+    out["high_52w"] = h.rolling(250, min_periods=200).max()
+    out["low_52w"] = l.rolling(250, min_periods=200).min()
     return out

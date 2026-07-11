@@ -1,8 +1,10 @@
 import Link from "next/link";
 import {
-  listStocks,
+  countStocks,
+  latestSignalStats,
   recentSignalEvents,
   recentCalendarEvents,
+  listSignalTypes,
 } from "@/lib/db";
 import { ANOMALY_NOTE } from "@/lib/constants";
 import SignalEventTable from "@/components/SignalEventTable";
@@ -11,62 +13,87 @@ export const dynamic = "force-dynamic";
 
 export default function Dashboard() {
   const events = recentSignalEvents(50);
-  const calendar = recentCalendarEvents(5);
-  const stocks = listStocks();
-  const latestDate = events[0]?.date;
-  const todayCount = events.filter((e) => e.date === latestDate).length;
+  const calendar = recentCalendarEvents(4);
+  const stockCount = countStocks();
+  const signalCount = listSignalTypes().length;
+  const { date: latestDate, count: todayCount } = latestSignalStats();
 
   return (
-    <div className="space-y-8">
-      <section>
-        <h1 className="text-2xl font-bold mb-1">ダッシュボード</h1>
-        <p className="text-sm text-slate-400">
-          テクニカル指標の状態を機械的に検知し、客観的事実として表示します。
+    <div className="space-y-14">
+      <section className="text-center pt-6 pb-2">
+        <h1 className="text-5xl font-semibold tracking-tight">
+          市場を、事実で見る。
+        </h1>
+        <p className="text-lg text-[#6e6e73] mt-4 max-w-xl mx-auto leading-relaxed">
+          東証プライム{stockCount.toLocaleString()}
+          銘柄のテクニカル指標を毎日機械的にチェックし、
+          条件に一致した事実だけをお届けします。
         </p>
       </section>
 
-      <section className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <div className="rounded-lg border border-slate-800 p-4">
-          <div className="text-slate-400 text-xs">監視銘柄数</div>
-          <div className="text-2xl font-bold">{stocks.length}</div>
-        </div>
-        <div className="rounded-lg border border-slate-800 p-4">
-          <div className="text-slate-400 text-xs">
-            直近検知日({latestDate ?? "-"})の検知数
-          </div>
-          <div className="text-2xl font-bold">{todayCount}</div>
-        </div>
-        <div className="rounded-lg border border-slate-800 p-4">
-          <div className="text-slate-400 text-xs">シグナル定義数</div>
-          <div className="text-2xl font-bold">
-            <Link href="/signals" className="hover:underline">
-              33種
-            </Link>
-          </div>
-        </div>
+      <section className="grid grid-cols-3 gap-3 max-w-3xl mx-auto">
+        {[
+          ["監視銘柄", `${stockCount.toLocaleString()}`, "/stocks"],
+          [
+            `直近検知(${latestDate ?? "-"})`,
+            `${todayCount.toLocaleString()}`,
+            "/backtest",
+          ],
+          ["シグナル定義", `${signalCount}種`, "/signals"],
+        ].map(([label, value, href]) => (
+          <Link
+            key={label}
+            href={href}
+            className="bg-white rounded-2xl border border-black/5 shadow-sm p-6 text-center hover:shadow-md transition-shadow"
+          >
+            <div className="text-3xl font-semibold tracking-tight">
+              {value}
+            </div>
+            <div className="text-xs text-[#6e6e73] mt-1">{label}</div>
+          </Link>
+        ))}
       </section>
 
       {calendar.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold mb-2">相場の暦(直近)</h2>
-          <ul className="space-y-2">
+          <div className="flex items-baseline justify-between mb-4">
+            <h2 className="text-2xl font-semibold tracking-tight">
+              相場の暦
+            </h2>
+            <Link
+              href="/calendar"
+              className="text-sm text-[#0066cc] hover:underline"
+            >
+              すべて見る →
+            </Link>
+          </div>
+          <div className="grid md:grid-cols-4 gap-3">
             {calendar.map((c) => (
-              <li
+              <div
                 key={`${c.event_type}-${c.date}`}
-                className="rounded border border-emerald-900/50 bg-emerald-950/30 px-3 py-2 text-sm"
+                className="bg-white rounded-2xl border border-black/5 shadow-sm p-5"
               >
-                <span className="text-slate-400 mr-2">{c.date}</span>
-                {c.title}
-              </li>
+                <div className="text-[11px] text-[#6e6e73]">{c.date}</div>
+                <div className="text-sm font-medium mt-1 leading-snug">
+                  {c.title}
+                </div>
+              </div>
             ))}
-          </ul>
-          <p className="text-xs text-slate-500 mt-2">{ANOMALY_NOTE}</p>
+          </div>
+          <p className="text-[11px] text-[#6e6e73] mt-3">{ANOMALY_NOTE}</p>
         </section>
       )}
 
       <section>
-        <h2 className="text-lg font-semibold mb-2">シグナル検知履歴(最新50件)</h2>
-        <SignalEventTable events={events} />
+        <h2 className="text-2xl font-semibold tracking-tight mb-4">
+          シグナル検知履歴
+          <span className="text-sm font-normal text-[#6e6e73] ml-3">
+            最新50件
+          </span>
+        </h2>
+        <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
+          <SignalEventTable events={events} />
+        </div>
       </section>
     </div>
   );

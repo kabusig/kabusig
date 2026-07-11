@@ -46,13 +46,14 @@ def _volume_surge(df):
 
 
 def _high_52w(df):
-    prev_max = df["high"].shift(1).rolling(250, min_periods=60).max()
-    return (df["high"] > prev_max) & newly_true(df["high"] > prev_max)
+    # 「52週」を名乗る以上、最低200営業日の履歴を要求する
+    prev_max = df["high"].shift(1).rolling(250, min_periods=200).max()
+    return newly_true(df["high"] > prev_max)
 
 
 def _low_52w(df):
-    prev_min = df["low"].shift(1).rolling(250, min_periods=60).min()
-    return (df["low"] < prev_min) & newly_true(df["low"] < prev_min)
+    prev_min = df["low"].shift(1).rolling(250, min_periods=200).min()
+    return newly_true(df["low"] < prev_min)
 
 
 def _kairi_plus(df):
@@ -123,11 +124,11 @@ CLASSIC_SIGNALS = [
     SignalDef("high_52w", "52週高値更新",
               "当日高値が過去52週(約250営業日)の高値を上回った状態。",
               "新値の更新は古くから記録される市場統計のひとつ。",
-              "classic", _high_52w, (), is_premium=True, min_rows=60),
+              "classic", _high_52w, (), is_premium=True, min_rows=210),
     SignalDef("low_52w", "52週安値更新",
               "当日安値が過去52週(約250営業日)の安値を下回った状態。",
               "新値の更新は古くから記録される市場統計のひとつ。",
-              "classic", _low_52w, (), is_premium=True, min_rows=60),
+              "classic", _low_52w, (), is_premium=True, min_rows=210),
     SignalDef("kairi_plus_8", "25日線プラス乖離拡大",
               "終値の25日移動平均線からの乖離率が+8%を上回った状態。",
               "移動平均乖離率は価格と平均線の距離を測る古典的指標。",

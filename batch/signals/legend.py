@@ -34,7 +34,7 @@ def _darvas_box(df):
 
 def _oneil_high_volume(df):
     """新高値・出来高増加: 52週高値更新と同時に出来高が20日平均の1.5倍以上。"""
-    prev_max = df["high"].shift(1).rolling(250, min_periods=60).max()
+    prev_max = df["high"].shift(1).rolling(250, min_periods=200).max()
     new_high = df["high"] > prev_max
     return newly_true(new_high & (df["volume_ratio20"] >= 1.5))
 
@@ -71,8 +71,10 @@ def _dow_trend(df, up: bool):
     high_pos = [positions[t] for t in high_idx]
     low_pos = [positions[t] for t in low_idx]
     for i, ts in enumerate(df.index):
-        hi = bisect.bisect_right(high_pos, i - 1) - 1
-        lo = bisect.bisect_right(low_pos, i - 1) - 1
+        # スイングは前後5日で確定するため、位置 p のピボットが当日 i 時点で
+        # 利用可能なのは p+5 <= i のもののみ(先読みバイアス防止)
+        hi = bisect.bisect_right(high_pos, i - 5) - 1
+        lo = bisect.bisect_right(low_pos, i - 5) - 1
         if hi < 1 or lo < 1:
             continue
         h2, h1 = df["high"].iloc[high_pos[hi - 1]], df["high"].iloc[high_pos[hi]]
@@ -116,7 +118,7 @@ LEGEND_SIGNALS = [
     SignalDef("oneil_new_high_volume", "新高値・出来高増加(オニール型)",
               "52週高値を更新し、同時に出来高が20日平均の1.5倍以上となった状態。",
               "William O'Neil の CAN-SLIM 分析で重視されたとされる新高値と出来高の組み合わせに由来。",
-              "legend", _oneil_high_volume, ("volume_ratio20",), is_premium=True, min_rows=60),
+              "legend", _oneil_high_volume, ("volume_ratio20",), is_premium=True, min_rows=210),
     SignalDef("dow_uptrend", "高値・安値切り上げ確認(ダウ理論型)",
               "直近のスイング高値と安値がともに切り上がり、終値が直近スイング高値を上回った状態。",
               "Charles Dow の相場論(ダウ理論)におけるトレンド定義に由来。",

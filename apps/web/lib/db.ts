@@ -82,6 +82,45 @@ export function listStocks(): Stock[] {
   );
 }
 
+export function latestSignalStats(): { date: string | null; count: number } {
+  const row = getDb()
+    .prepare(
+      "select date, count(*) as n from signal_events group by date order by date desc limit 1"
+    )
+    .get() as { date: string; n: number } | undefined;
+  return { date: row?.date ?? null, count: row?.n ?? 0 };
+}
+
+export function countStocks(): number {
+  const row = getDb().prepare("select count(*) as n from stocks").get() as {
+    n: number;
+  };
+  return row.n;
+}
+
+export type StockWithPrice = Stock & {
+  close: number | null;
+  price_date: string | null;
+};
+
+export function searchStocks(query = "", limit = 100): StockWithPrice[] {
+  // 並び順は証券コード順(中立的順序)のみ
+  const like = `%${query}%`;
+  return plain<StockWithPrice>(
+    getDb()
+      .prepare(
+        `select s.code, s.name, s.market, p.close, p.date as price_date
+         from stocks s
+         left join (select code, max(date) as date from daily_prices group by code) m
+           on m.code = s.code
+         left join daily_prices p on p.code = m.code and p.date = m.date
+         where s.code like ? or s.name like ?
+         order by s.code limit ?`
+      )
+      .all(like, like, limit)
+  );
+}
+
 export function getStock(code: string): Stock | undefined {
   return plainOne<Stock>(
     getDb().prepare("select code, name, market from stocks where code = ?").get(code)

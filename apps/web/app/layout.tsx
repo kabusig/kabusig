@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 const NAV = [
   { href: "/", label: "ダッシュボード" },
-  { href: "/stocks", label: "銘柄一覧" },
+  { href: "/stocks", label: "銘柄" },
   { href: "/signals", label: "シグナル図鑑" },
   { href: "/calendar", label: "相場の暦" },
   { href: "/backtest", label: "バックテスト" },
@@ -25,17 +25,20 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className="min-h-screen flex flex-col">
-        <header className="border-b border-slate-800 bg-slate-950/80 sticky top-0 z-10 backdrop-blur">
-          <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-6 overflow-x-auto">
-            <Link href="/" className="font-bold text-lg whitespace-nowrap">
-              📈 {SERVICE_NAME}
+        <header className="sticky top-0 z-20 bg-white/70 backdrop-blur-xl border-b border-black/10">
+          <div className="max-w-6xl mx-auto px-6 h-12 flex items-center gap-8 overflow-x-auto">
+            <Link
+              href="/"
+              className="font-semibold text-[15px] tracking-tight whitespace-nowrap"
+            >
+              {SERVICE_NAME}
             </Link>
-            <nav className="flex gap-4 text-sm text-slate-300">
+            <nav className="flex gap-6 text-xs text-[#424245]">
               {NAV.map((n) => (
                 <Link
                   key={n.href}
                   href={n.href}
-                  className="hover:text-white whitespace-nowrap"
+                  className="hover:text-black transition-colors whitespace-nowrap"
                 >
                   {n.label}
                 </Link>
@@ -43,23 +46,23 @@ export default function RootLayout({
             </nav>
           </div>
         </header>
-        <main className="max-w-6xl mx-auto px-4 py-6 w-full flex-1">
+        <main className="max-w-6xl mx-auto px-6 py-12 w-full flex-1">
           {children}
         </main>
-        <footer className="border-t border-slate-800 mt-10">
-          <div className="max-w-6xl mx-auto px-4 py-6 text-xs text-slate-400 space-y-3">
+        <footer className="border-t border-black/10 bg-[#f5f5f7]">
+          <div className="max-w-6xl mx-auto px-6 py-8 text-[11px] leading-relaxed text-[#6e6e73] space-y-4">
             <p>{DISCLAIMER}</p>
-            <div className="flex gap-4 flex-wrap">
-              <Link href="/legal/disclaimer" className="hover:text-white">
+            <div className="flex gap-5 flex-wrap border-t border-black/5 pt-4">
+              <Link href="/legal/disclaimer" className="hover:text-black">
                 免責事項
               </Link>
-              <Link href="/legal/terms" className="hover:text-white">
+              <Link href="/legal/terms" className="hover:text-black">
                 利用規約
               </Link>
-              <Link href="/legal/privacy" className="hover:text-white">
+              <Link href="/legal/privacy" className="hover:text-black">
                 プライバシーポリシー
               </Link>
-              <Link href="/legal/tokushoho" className="hover:text-white">
+              <Link href="/legal/tokushoho" className="hover:text-black">
                 特定商取引法に基づく表記
               </Link>
             </div>

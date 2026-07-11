@@ -33,33 +33,36 @@ export default async function StockDetail({
     .map((e) => ({ date: e.date, label: e.signal_name }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold">
-          {stock.code} {stock.name}
-          <span className="ml-3 text-sm font-normal text-slate-400">
-            {stock.market}
-          </span>
+        <div className="text-sm text-[#6e6e73]">
+          {stock.code} ・ {stock.market}
+        </div>
+        <h1 className="text-4xl font-semibold tracking-tight mt-1">
+          {stock.name}
         </h1>
         {latest && (
-          <p className="text-lg mt-1">
-            {latest.close.toLocaleString()}円
+          <p className="text-2xl mt-3 font-medium tracking-tight">
+            {latest.close.toLocaleString()}
+            <span className="text-base font-normal">円</span>
             {changePct != null && (
               <span
-                className={`ml-2 text-sm ${
-                  changePct >= 0 ? "text-red-400" : "text-blue-400"
+                className={`ml-3 text-base ${
+                  changePct >= 0 ? "text-[#d70015]" : "text-[#0066cc]"
                 }`}
               >
-                前日比 {changePct >= 0 ? "+" : ""}
+                {changePct >= 0 ? "+" : ""}
                 {changePct.toFixed(2)}%
               </span>
             )}
-            <span className="ml-2 text-xs text-slate-500">({latest.date})</span>
+            <span className="ml-3 text-xs font-normal text-[#6e6e73]">
+              {latest.date}
+            </span>
           </p>
         )}
       </div>
 
-      <section className="rounded-lg border border-slate-800 p-3">
+      <section className="bg-white rounded-2xl border border-black/5 shadow-sm p-5">
         <PriceChart
           candles={prices}
           sma5={indicators.map((i) => ({ date: i.date, value: i.sma5 }))}
@@ -67,30 +70,44 @@ export default async function StockDetail({
           sma75={indicators.map((i) => ({ date: i.date, value: i.sma75 }))}
           markers={markers}
         />
-        <p className="text-xs text-slate-500 mt-2">
+        <p className="text-[11px] text-[#6e6e73] mt-3">
           ●はシグナル検知日(指標が条件に一致した日)を示します。
         </p>
       </section>
 
       {latestInd && (
-        <section className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
             ["RSI(14)", latestInd.rsi14?.toFixed(1)],
             ["MACD", latestInd.macd?.toFixed(1)],
             ["出来高比(20日)", latestInd.volume_ratio20?.toFixed(2)],
-            ["25日線乖離率", latestInd.kairi25 != null ? `${latestInd.kairi25.toFixed(2)}%` : null],
+            [
+              "25日線乖離率",
+              latestInd.kairi25 != null
+                ? `${latestInd.kairi25.toFixed(2)}%`
+                : null,
+            ],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-lg border border-slate-800 p-4">
-              <div className="text-slate-400 text-xs">{label}</div>
-              <div className="text-xl font-bold">{value ?? "-"}</div>
+            <div
+              key={label}
+              className="bg-white rounded-2xl border border-black/5 shadow-sm p-5"
+            >
+              <div className="text-[#6e6e73] text-xs">{label}</div>
+              <div className="text-2xl font-semibold tracking-tight mt-1">
+                {value ?? "-"}
+              </div>
             </div>
           ))}
         </section>
       )}
 
       <section>
-        <h2 className="text-lg font-semibold mb-2">シグナル検知履歴</h2>
-        <SignalEventTable events={events} showStock={false} />
+        <h2 className="text-2xl font-semibold tracking-tight mb-4">
+          シグナル検知履歴
+        </h2>
+        <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
+          <SignalEventTable events={events} showStock={false} />
+        </div>
       </section>
     </div>
   );

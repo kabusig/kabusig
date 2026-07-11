@@ -32,13 +32,59 @@ def fetch_one(code: str, period: str = "2y") -> pd.DataFrame | None:
     return df
 
 
+def fetch_bulk(storage, codes: list[str], period: str, chunk_size: int = 50) -> tuple[int, list[str]]:
+    """yf.download の一括取得(スレッド並列)。全銘柄取得用。"""
+    import yfinance as yf
+    ok, ng = 0, []
+    for i in range(0, len(codes), chunk_size):
+        chunk = codes[i:i + chunk_size]
+        tickers = [stocklist.yf_ticker(c) for c in chunk]
+        try:
+            data = yf.download(
+                tickers=" ".join(tickers), period=period, interval="1d",
+                auto_adjust=True, group_by="ticker", threads=True,
+                progress=False,
+            )
+        except Exception as e:  # noqa: BLE001
+            print(f"  chunk {i}: ERROR {e}", file=sys.stderr)
+            ng.extend(chunk)
+            time.sleep(5)
+            continue
+        for code, ticker in zip(chunk, tickers):
+            try:
+                df = data[ticker] if len(tickers) > 1 else data
+                df = df.rename(columns={
+                    "Open": "open", "High": "high", "Low": "low",
+                    "Close": "close", "Volume": "volume",
+                })[["open", "high", "low", "close", "volume"]].dropna()
+                if df.empty:
+                    ng.append(code)
+                    continue
+                df.index = pd.to_datetime(df.index).tz_localize(None)
+                storage.upsert_prices(code, df)
+                ok += 1
+            except Exception:  # noqa: BLE001
+                ng.append(code)
+        print(f"  progress: {min(i + chunk_size, len(codes))}/{len(codes)} (ok={ok})")
+        time.sleep(1.0)  # 行儀よく
+    return ok, ng
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--period", default="2y")
     parser.add_argument("--codes", default="")
+    parser.add_argument("--bulk", action="store_true",
+                        help="stocksテーブルの全銘柄を一括取得")
     args = parser.parse_args()
 
     storage = get_storage()
+    if args.bulk:
+        codes = storage.list_codes()
+        ok, ng = fetch_bulk(storage, codes, args.period)
+        print(f"fetch_prices done: ok={ok} ng={len(ng)} {ng[:20]}")
+        return
+
     storage.upsert_stocks(stocklist.STOCKS)
     codes = args.codes.split(",") if args.codes else [c for c, _, _ in stocklist.STOCKS]
 
