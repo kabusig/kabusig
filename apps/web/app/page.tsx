@@ -128,9 +128,9 @@ export default function Dashboard() {
         <section>
           <div className="flex items-baseline justify-between mb-5">
             <h2 className="text-3xl font-semibold tracking-tight">
-              3営業日後の結果
+              検知後の結果
               <span className="text-sm font-normal text-[#6e6e73] ml-3">
-                実績が確定した直近の検知
+                実績が確定した直近の検知(1〜3営業日後)
               </span>
             </h2>
             <Link

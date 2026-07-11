@@ -55,8 +55,12 @@ create table if not exists signal_events (
   signal_type text,
   date text not null,
   detail text,
-  return_3d_pct real,   -- 検知日終値→3営業日後終値の騰落率(過去の事実)
-  return_3d_yen real,   -- 同・円差
+  return_1d_pct real,   -- 検知日終値→1営業日後終値の騰落率(過去の事実)
+  return_1d_yen real,
+  return_2d_pct real,
+  return_2d_yen real,
+  return_3d_pct real,
+  return_3d_yen real,
   created_at text default (datetime('now')),
   unique (code, signal_type, date)
 );
@@ -117,6 +121,10 @@ class SqliteStorage:
         self.conn.executescript(SQLITE_SCHEMA)
         # 既存DBへのカラム追加(スキーマ進化)
         for ddl in (
+            "alter table signal_events add column return_1d_pct real",
+            "alter table signal_events add column return_1d_yen real",
+            "alter table signal_events add column return_2d_pct real",
+            "alter table signal_events add column return_2d_yen real",
             "alter table signal_events add column return_3d_pct real",
             "alter table signal_events add column return_3d_yen real",
         ):

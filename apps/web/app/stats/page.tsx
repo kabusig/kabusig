@@ -5,7 +5,7 @@ import CategoryBadge from "@/components/CategoryBadge";
 
 export const dynamic = "force-dynamic";
 
-const HOLDS = [1, 3, 5, 20];
+const HOLDS = [1, 2, 3, 5, 20];
 const SORTS = [
   { key: "count", label: "発生回数" },
   { key: "up_ratio", label: "上昇した割合" },

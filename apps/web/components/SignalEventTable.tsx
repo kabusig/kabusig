@@ -2,20 +2,29 @@ import Link from "next/link";
 import type { SignalEvent } from "@/lib/db";
 import CategoryBadge from "./CategoryBadge";
 
-function Result3d({ e }: { e: SignalEvent }) {
-  if (e.return_3d_pct == null || e.return_3d_yen == null) {
+function Result({
+  pct,
+  yen,
+}: {
+  pct: number | null;
+  yen: number | null;
+}) {
+  if (pct == null || yen == null) {
     return <span className="text-[#6e6e73] text-xs">集計中</span>;
   }
-  const up = e.return_3d_pct >= 0;
+  const up = pct >= 0;
   return (
     <span
-      className={`font-medium tabular-nums ${
+      className={`font-medium tabular-nums text-xs ${
         up ? "text-[#d70015]" : "text-[#0066cc]"
       }`}
     >
       {up ? "+" : ""}
-      {e.return_3d_yen.toLocaleString()}円({up ? "+" : ""}
-      {e.return_3d_pct.toFixed(2)}%)
+      {yen.toLocaleString()}円
+      <span className="block text-[10px] opacity-80">
+        {up ? "+" : ""}
+        {pct.toFixed(2)}%
+      </span>
     </span>
   );
 }
@@ -39,6 +48,8 @@ export default function SignalEventTable({
             {showStock && <th className="py-2.5 pr-4 font-medium">銘柄</th>}
             <th className="py-2.5 pr-4 font-medium">シグナル(状態)</th>
             <th className="py-2.5 pr-4 font-medium">分類</th>
+            <th className="py-2.5 pr-4 font-medium">1営業日後</th>
+            <th className="py-2.5 pr-4 font-medium">2営業日後</th>
             <th className="py-2.5 pr-4 font-medium">3営業日後</th>
             <th className="py-2.5 font-medium">検知値</th>
           </tr>
@@ -72,7 +83,13 @@ export default function SignalEventTable({
                   <CategoryBadge category={e.category} />
                 </td>
                 <td className="py-3 pr-4 whitespace-nowrap">
-                  <Result3d e={e} />
+                  <Result pct={e.return_1d_pct} yen={e.return_1d_yen} />
+                </td>
+                <td className="py-3 pr-4 whitespace-nowrap">
+                  <Result pct={e.return_2d_pct} yen={e.return_2d_yen} />
+                </td>
+                <td className="py-3 pr-4 whitespace-nowrap">
+                  <Result pct={e.return_3d_pct} yen={e.return_3d_yen} />
                 </td>
                 <td className="py-3 text-[#6e6e73] text-xs">
                   {close != null && <span>終値 {close}円 </span>}
@@ -86,7 +103,7 @@ export default function SignalEventTable({
         </tbody>
       </table>
       <p className="text-[11px] text-[#6e6e73] mt-3">
-        「3営業日後」は検知日終値から3営業日後終値までの実際の値動き(過去の事実)です。将来の値動きを保証・示唆するものではありません。
+        「N営業日後」は検知日終値からN営業日後終値までの実際の値動き(過去の事実)です。将来の値動きを保証・示唆するものではありません。
       </p>
     </div>
   );

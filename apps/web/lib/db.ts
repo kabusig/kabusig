@@ -40,7 +40,11 @@ export type SignalEvent = {
   is_premium: number;
   date: string;
   detail: string;
-  return_3d_pct: number | null; // 検知日終値→3営業日後終値(過去の事実)
+  return_1d_pct: number | null; // 検知日終値→N営業日後終値(過去の事実)
+  return_1d_yen: number | null;
+  return_2d_pct: number | null;
+  return_2d_yen: number | null;
+  return_3d_pct: number | null;
   return_3d_yen: number | null;
 };
 
@@ -157,7 +161,9 @@ export function recentSignalEvents(limit = 100, code?: string): SignalEvent[] {
   const base = `
     select e.id, e.code, s.name as stock_name, e.signal_type,
            t.name as signal_name, t.description, t.category, t.origin,
-           t.is_premium, e.date, e.detail, e.return_3d_pct, e.return_3d_yen
+           t.is_premium, e.date, e.detail,
+           e.return_1d_pct, e.return_1d_yen, e.return_2d_pct, e.return_2d_yen,
+           e.return_3d_pct, e.return_3d_yen
     from signal_events e
     join stocks s on s.code = e.code
     join signal_types t on t.id = e.signal_type`;
@@ -253,11 +259,13 @@ export function recentSignalEventsWithResult(limit = 15): SignalEvent[] {
       .prepare(
         `select e.id, e.code, s.name as stock_name, e.signal_type,
                 t.name as signal_name, t.description, t.category, t.origin,
-                t.is_premium, e.date, e.detail, e.return_3d_pct, e.return_3d_yen
+                t.is_premium, e.date, e.detail,
+                e.return_1d_pct, e.return_1d_yen, e.return_2d_pct, e.return_2d_yen,
+                e.return_3d_pct, e.return_3d_yen
          from signal_events e
          join stocks s on s.code = e.code
          join signal_types t on t.id = e.signal_type
-         where e.return_3d_pct is not null
+         where e.return_1d_pct is not null
          order by e.date desc, e.code limit ?`
       )
       .all(limit)
