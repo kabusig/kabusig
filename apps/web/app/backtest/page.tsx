@@ -59,6 +59,7 @@ export default async function BacktestPage({
             className="bg-[#f5f5f7] rounded-xl px-4 py-2.5 text-sm"
           >
             <option value="1">1営業日</option>
+            <option value="3">3営業日</option>
             <option value="5">5営業日</option>
             <option value="20">20営業日</option>
           </select>

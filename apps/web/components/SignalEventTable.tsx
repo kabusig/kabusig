@@ -2,6 +2,24 @@ import Link from "next/link";
 import type { SignalEvent } from "@/lib/db";
 import CategoryBadge from "./CategoryBadge";
 
+function Result3d({ e }: { e: SignalEvent }) {
+  if (e.return_3d_pct == null || e.return_3d_yen == null) {
+    return <span className="text-[#6e6e73] text-xs">集計中</span>;
+  }
+  const up = e.return_3d_pct >= 0;
+  return (
+    <span
+      className={`font-medium tabular-nums ${
+        up ? "text-[#d70015]" : "text-[#0066cc]"
+      }`}
+    >
+      {up ? "+" : ""}
+      {e.return_3d_yen.toLocaleString()}円({up ? "+" : ""}
+      {e.return_3d_pct.toFixed(2)}%)
+    </span>
+  );
+}
+
 export default function SignalEventTable({
   events,
   showStock = true,
@@ -21,6 +39,7 @@ export default function SignalEventTable({
             {showStock && <th className="py-2.5 pr-4 font-medium">銘柄</th>}
             <th className="py-2.5 pr-4 font-medium">シグナル(状態)</th>
             <th className="py-2.5 pr-4 font-medium">分類</th>
+            <th className="py-2.5 pr-4 font-medium">3営業日後</th>
             <th className="py-2.5 font-medium">検知値</th>
           </tr>
         </thead>
@@ -32,10 +51,7 @@ export default function SignalEventTable({
             } catch {}
             const { close, ...rest } = detail;
             return (
-              <tr
-                key={e.id}
-                className="border-b border-black/5 last:border-0"
-              >
+              <tr key={e.id} className="border-b border-black/5 last:border-0">
                 <td className="py-3 pr-4 whitespace-nowrap text-[#6e6e73]">
                   {e.date}
                 </td>
@@ -55,6 +71,9 @@ export default function SignalEventTable({
                 <td className="py-3 pr-4">
                   <CategoryBadge category={e.category} />
                 </td>
+                <td className="py-3 pr-4 whitespace-nowrap">
+                  <Result3d e={e} />
+                </td>
                 <td className="py-3 text-[#6e6e73] text-xs">
                   {close != null && <span>終値 {close}円 </span>}
                   {Object.entries(rest)
@@ -66,6 +85,9 @@ export default function SignalEventTable({
           })}
         </tbody>
       </table>
+      <p className="text-[11px] text-[#6e6e73] mt-3">
+        「3営業日後」は検知日終値から3営業日後終値までの実際の値動き(過去の事実)です。将来の値動きを保証・示唆するものではありません。
+      </p>
     </div>
   );
 }

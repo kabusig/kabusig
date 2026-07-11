@@ -18,14 +18,21 @@ import feedparser
 
 from storage import get_storage
 
-# 公式RSSフィード(媒体名, URL)。RSSを廃止した媒体は追加しないこと。
+# 公式RSSフィード(媒体名, URL, 既定タグ)。RSSを廃止した媒体は追加しないこと。
+# まとめブログ・SNS系も「公式に配信されているRSS」のみ利用する。
 FEEDS = [
-    ("NHKニュース(経済)", "https://www3.nhk.or.jp/rss/news/cat5.xml"),
-    ("ITmedia ビジネスオンライン", "https://rss.itmedia.co.jp/rss/2.0/business.xml"),
-    ("東洋経済オンライン", "https://toyokeizai.net/list/feed/rss"),
-    ("ダイヤモンド・オンライン", "https://diamond.jp/list/feed/rss"),
-    ("PRESIDENT Online", "https://president.jp/list/rss"),
-    ("はてなブックマーク(経済・金融 人気)", "https://b.hatena.ne.jp/hotentry/economics.rss"),
+    # 報道・経済メディア
+    ("NHKニュース(経済)", "https://www3.nhk.or.jp/rss/news/cat5.xml", []),
+    ("Yahoo!ニュース(経済)", "https://news.yahoo.co.jp/rss/topics/business.xml", []),
+    ("ITmedia ビジネスオンライン", "https://rss.itmedia.co.jp/rss/2.0/business.xml", []),
+    ("東洋経済オンライン", "https://toyokeizai.net/list/feed/rss", []),
+    ("ダイヤモンド・オンライン", "https://diamond.jp/list/feed/rss", []),
+    ("PRESIDENT Online", "https://president.jp/list/rss", []),
+    # 個人ブログ・まとめ・SNS発の話題(タグ「話題」)
+    ("市況かぶ全力2階建", "http://kabumatome.doorblog.jp/index.rdf", ["話題"]),
+    ("はてなブックマーク(経済・金融 人気)", "https://b.hatena.ne.jp/hotentry/economics.rss", ["話題"]),
+    ("はてなブックマーク(株 人気)", "https://b.hatena.ne.jp/q/%E6%A0%AA?mode=rss&sort=popular", ["話題"]),
+    ("Togetter(人気まとめ)", "https://togetter.com/rss/index", ["話題"]),
 ]
 
 # タイトルからの機械的タグ付け(キーワード一致のみ、内容の解釈はしない)
@@ -55,7 +62,7 @@ def parse_published(entry) -> str | None:
 def main():
     storage = get_storage()
     total = 0
-    for source_name, url in FEEDS:
+    for source_name, url, default_tags in FEEDS:
         try:
             feed = feedparser.parse(url)
         except Exception as e:  # noqa: BLE001
@@ -67,11 +74,12 @@ def main():
             link = getattr(entry, "link", "").strip()
             if not title or not link:
                 continue
+            tags = list(dict.fromkeys(default_tags + auto_tags(title)))
             cur = storage.conn.execute(
                 "insert or ignore into news_links"
                 "(title,url,source_name,published_at,tags) values(?,?,?,?,?)",
                 (title, link, source_name, parse_published(entry),
-                 json.dumps(auto_tags(title), ensure_ascii=False)),
+                 json.dumps(tags, ensure_ascii=False)),
             )
             n += cur.rowcount
         storage.conn.commit()

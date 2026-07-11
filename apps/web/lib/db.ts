@@ -40,6 +40,21 @@ export type SignalEvent = {
   is_premium: number;
   date: string;
   detail: string;
+  return_3d_pct: number | null; // 検知日終値→3営業日後終値(過去の事実)
+  return_3d_yen: number | null;
+};
+
+export type SignalStat = {
+  signal_type: string;
+  signal_name: string;
+  category: string;
+  hold_days: number;
+  count: number;
+  up_count: number;
+  down_count: number;
+  up_ratio_pct: number;
+  mean_return_pct: number;
+  median_return_pct: number;
 };
 export type SignalType = {
   id: string;
@@ -142,7 +157,7 @@ export function recentSignalEvents(limit = 100, code?: string): SignalEvent[] {
   const base = `
     select e.id, e.code, s.name as stock_name, e.signal_type,
            t.name as signal_name, t.description, t.category, t.origin,
-           t.is_premium, e.date, e.detail
+           t.is_premium, e.date, e.detail, e.return_3d_pct, e.return_3d_yen
     from signal_events e
     join stocks s on s.code = e.code
     join signal_types t on t.id = e.signal_type`;
@@ -178,6 +193,75 @@ export function getIndicators(code: string, limit = 500): IndicatorRow[] {
       )
       .all(code, limit)
   ).reverse();
+}
+
+const STAT_SORT_COLUMNS: Record<string, string> = {
+  count: "st.count",
+  up_ratio: "st.up_ratio_pct",
+  mean: "st.mean_return_pct",
+};
+
+export function getSignalStats(
+  holdDays = 3,
+  sort: "count" | "up_ratio" | "mean" = "count"
+): SignalStat[] {
+  // 並び順はユーザーが選択した統計量の降順(過去の統計的事実の整列)
+  const col = STAT_SORT_COLUMNS[sort] ?? STAT_SORT_COLUMNS.count;
+  return plain<SignalStat>(
+    getDb()
+      .prepare(
+        `select st.signal_type, t.name as signal_name, t.category,
+                st.hold_days, st.count, st.up_count, st.down_count,
+                st.up_ratio_pct, st.mean_return_pct, st.median_return_pct
+         from signal_stats st join signal_types t on t.id = st.signal_type
+         where st.hold_days = ?
+         order by ${col} desc, st.signal_type`
+      )
+      .all(holdDays)
+  );
+}
+
+export type NewsItem = {
+  id: number;
+  title: string;
+  url: string;
+  source_name: string;
+  published_at: string | null;
+  tags: string | null;
+};
+
+export function recentNews(limit = 10): NewsItem[] {
+  const rows = plain<NewsItem>(
+    getDb()
+      .prepare(
+        "select id, title, url, source_name, published_at, tags from news_links " +
+          "order by published_at desc, id desc limit ?"
+      )
+      .all(limit * 2)
+  );
+  // 同一タイトルの重複(媒体のURL違い再配信)を除去
+  const seen = new Set<string>();
+  return rows
+    .filter((r) => !seen.has(r.title) && (seen.add(r.title), true))
+    .slice(0, limit);
+}
+
+export function recentSignalEventsWithResult(limit = 15): SignalEvent[] {
+  // 3営業日が経過し実績が確定した検知(検知日降順)
+  return plain<SignalEvent>(
+    getDb()
+      .prepare(
+        `select e.id, e.code, s.name as stock_name, e.signal_type,
+                t.name as signal_name, t.description, t.category, t.origin,
+                t.is_premium, e.date, e.detail, e.return_3d_pct, e.return_3d_yen
+         from signal_events e
+         join stocks s on s.code = e.code
+         join signal_types t on t.id = e.signal_type
+         where e.return_3d_pct is not null
+         order by e.date desc, e.code limit ?`
+      )
+      .all(limit)
+  );
 }
 
 export function recentCalendarEvents(limit = 30): CalendarEvent[] {

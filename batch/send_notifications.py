@@ -1,5 +1,9 @@
 """LINE通知送信バッチ(フェーズ1: 開発者本人への通知のみ)。
 
+【プラン方針】LINE通知は有料会員専用機能。無料枠は設けない。
+既定はシグナル検知ごとの都度通知。--digest は1通にまとめたい場合の
+オプション(有料会員の設定項目として提供予定)。
+
 - LINE_CHANNEL_ACCESS_TOKEN / LINE_DEV_USER_ID 未設定時は dry-run(標準出力)
 - notification_logs の unique 制約で重複送信を防止
 - 送信失敗は指数バックオフで3回リトライ、以後スキップしログに記録
@@ -65,7 +69,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--date", default=date.today().strftime("%Y-%m-%d"))
     parser.add_argument("--digest", action="store_true",
-                        help="当日分を1通にまとめて送信(無料会員仕様)")
+                        help="当日分を1通にまとめて送信(まとめ通知設定)")
     args = parser.parse_args()
 
     storage = get_storage()

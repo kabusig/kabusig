@@ -11,12 +11,13 @@ export const metadata: Metadata = {
 
 const NAV = [
   { href: "/", label: "ダッシュボード" },
+  { href: "/news", label: "ニュース" },
   { href: "/stocks", label: "銘柄" },
   { href: "/signals", label: "シグナル図鑑" },
-  { href: "/calendar", label: "相場の暦" },
+  { href: "/stats", label: "統計" },
   { href: "/backtest", label: "バックテスト" },
-  { href: "/news", label: "ニュース" },
-  { href: "/pricing", label: "料金" },
+  { href: "/calendar", label: "相場の暦" },
+  { href: "/pricing", label: "プレミアム" },
 ];
 
 export default function RootLayout({

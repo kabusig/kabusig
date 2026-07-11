@@ -39,15 +39,6 @@ export default function SignalsPage() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-semibold text-[15px]">{t.name}</span>
                     <CategoryBadge category={t.category} />
-                    {t.is_premium ? (
-                      <span className="text-[11px] text-[#b25000] bg-[#fff3e0] rounded-full px-2.5 py-0.5 font-medium">
-                        有料プラン
-                      </span>
-                    ) : (
-                      <span className="text-[11px] text-[#6e6e73] bg-[#f5f5f7] rounded-full px-2.5 py-0.5 font-medium">
-                        無料
-                      </span>
-                    )}
                   </div>
                   <p className="text-sm text-[#424245] leading-relaxed">
                     {t.description}

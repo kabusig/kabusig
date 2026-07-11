@@ -28,7 +28,10 @@ jobs:
           LINE_DEV_USER_ID: ${{ secrets.LINE_DEV_USER_ID }}
           NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
         run: |
-          python fetch_prices.py --period 3mo
+          python fetch_stocklist.py
+          python fetch_prices.py --bulk --period 3mo
           python calc_indicators.py
           python detect_signals.py
+          python calc_signal_results.py
+          python fetch_news.py
           python send_notifications.py

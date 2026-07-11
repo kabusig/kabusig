@@ -55,8 +55,22 @@ create table if not exists signal_events (
   signal_type text,
   date text not null,
   detail text,
+  return_3d_pct real,   -- 検知日終値→3営業日後終値の騰落率(過去の事実)
+  return_3d_yen real,   -- 同・円差
   created_at text default (datetime('now')),
   unique (code, signal_type, date)
+);
+create table if not exists signal_stats (
+  signal_type text,
+  hold_days integer,
+  count integer,
+  up_count integer,
+  down_count integer,
+  up_ratio_pct real,
+  mean_return_pct real,
+  median_return_pct real,
+  updated_at text default (datetime('now')),
+  primary key (signal_type, hold_days)
 );
 create table if not exists earnings_schedule (
   code text, announce_date text, fiscal_quarter text,
@@ -101,6 +115,15 @@ class SqliteStorage:
         self.path = path or config.SQLITE_PATH
         self.conn = sqlite3.connect(self.path)
         self.conn.executescript(SQLITE_SCHEMA)
+        # 既存DBへのカラム追加(スキーマ進化)
+        for ddl in (
+            "alter table signal_events add column return_3d_pct real",
+            "alter table signal_events add column return_3d_yen real",
+        ):
+            try:
+                self.conn.execute(ddl)
+            except sqlite3.OperationalError:
+                pass  # 追加済み
         self.conn.commit()
 
     # ---- マスタ ----
