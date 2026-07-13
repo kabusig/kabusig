@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: `%s | ${SERVICE_NAME}`,
   },
   description:
-    "東証プライム全銘柄のテクニカル指標・シグナル検知・決算スケジュールを機械的に通知する情報ツール「カブシグ」",
+    "東証プライム全銘柄のテクニカル指標・シグナル検知・決算スケジュールを機械的に通知する情報ツール「カブシグナル」",
 };
 
 const NAV = [

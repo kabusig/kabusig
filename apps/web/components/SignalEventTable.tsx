@@ -34,13 +34,21 @@ function formatDetail(rest: Record<string, number>): string {
     .join(" / ");
 }
 
-function Result({
-  pct,
-  yen,
-}: {
-  pct: number | null;
-  yen: number | null;
-}) {
+function parseDetail(raw: string | null): {
+  close: number | null;
+  rest: Record<string, number>;
+} {
+  let detail: Record<string, number> = {};
+  try {
+    detail = JSON.parse(raw ?? "{}");
+  } catch {}
+  const { close = null, ...rest } = detail as Record<string, number> & {
+    close?: number;
+  };
+  return { close, rest };
+}
+
+function Result({ pct, yen }: { pct: number | null; yen: number | null }) {
   if (pct == null || yen == null) {
     return <span className="text-[#6e6e73] text-xs">集計中</span>;
   }
@@ -61,6 +69,39 @@ function Result({
   );
 }
 
+// モバイル: 1営業日後などをラベル付き横並びで表示
+function ResultInline({
+  label,
+  pct,
+  yen,
+}: {
+  label: string;
+  pct: number | null;
+  yen: number | null;
+}) {
+  const up = pct != null && pct >= 0;
+  return (
+    <div className="flex flex-col items-center">
+      <span className="text-[10px] text-[#6e6e73]">{label}</span>
+      {pct == null || yen == null ? (
+        <span className="text-[#6e6e73] text-[11px]">集計中</span>
+      ) : (
+        <span
+          className={`text-[11px] font-medium tabular-nums ${
+            up ? "text-[#d70015]" : "text-[#0066cc]"
+          }`}
+        >
+          {up ? "+" : ""}
+          {pct.toFixed(2)}%
+        </span>
+      )}
+    </div>
+  );
+}
+
+const NOTE =
+  "「N営業日後」は検知日終値からN営業日後終値までの実際の値動き(過去の事実)です。将来の値動きを保証・示唆するものではありません。";
+
 export default function SignalEventTable({
   events,
   showStock = true,
@@ -72,71 +113,108 @@ export default function SignalEventTable({
     return <p className="text-[#6e6e73] text-sm">検知履歴はありません。</p>;
   }
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="text-left text-[#6e6e73] text-xs border-b border-black/5">
-            <th className="py-2.5 pr-4 font-medium">検知日</th>
-            {showStock && <th className="py-2.5 pr-4 font-medium">銘柄</th>}
-            <th className="py-2.5 pr-4 font-medium">シグナル(状態)</th>
-            <th className="py-2.5 pr-4 font-medium">分類</th>
-            <th className="py-2.5 pr-4 font-medium">1営業日後</th>
-            <th className="py-2.5 pr-4 font-medium">2営業日後</th>
-            <th className="py-2.5 pr-4 font-medium">3営業日後</th>
-            <th className="py-2.5 font-medium">検知値</th>
-          </tr>
-        </thead>
-        <tbody>
-          {events.map((e) => {
-            let detail: Record<string, number> = {};
-            try {
-              detail = JSON.parse(e.detail ?? "{}");
-            } catch {}
-            const { close, ...rest } = detail;
-            return (
-              <tr key={e.id} className="border-b border-black/5 last:border-0">
-                <td className="py-3 pr-4 whitespace-nowrap text-[#6e6e73]">
-                  {e.date}
-                </td>
-                {showStock && (
-                  <td className="py-3 pr-4 whitespace-nowrap">
-                    <Link
-                      href={`/stocks/${e.code}`}
-                      className="text-[#0066cc] hover:underline"
-                    >
-                      {e.code} {e.stock_name}
-                    </Link>
+    <div>
+      {/* モバイル: カード表示(銘柄の下にシグナル名) */}
+      <div className="md:hidden space-y-3">
+        {events.map((e) => {
+          const { close, rest } = parseDetail(e.detail);
+          return (
+            <div
+              key={e.id}
+              className="border border-black/5 rounded-xl p-4 bg-white"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[11px] text-[#6e6e73]">{e.date}</span>
+                <CategoryBadge category={e.category} />
+              </div>
+              {showStock && (
+                <Link
+                  href={`/stocks/${e.code}`}
+                  className="text-[#0066cc] hover:underline text-sm font-medium block mt-1"
+                >
+                  {e.code} {e.stock_name}
+                </Link>
+              )}
+              {/* シグナル名を銘柄の下に大きく表示 */}
+              <div className="text-[15px] font-semibold mt-1">
+                {e.signal_name}
+              </div>
+              <div className="flex justify-around mt-3 border-t border-black/5 pt-3">
+                <ResultInline label="1営業日後" pct={e.return_1d_pct} yen={e.return_1d_yen} />
+                <ResultInline label="2営業日後" pct={e.return_2d_pct} yen={e.return_2d_yen} />
+                <ResultInline label="3営業日後" pct={e.return_3d_pct} yen={e.return_3d_yen} />
+              </div>
+              <div className="text-[11px] text-[#6e6e73] mt-2">
+                {close != null && <span>終値 {close.toLocaleString()}円 </span>}
+                {formatDetail(rest)}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* デスクトップ: テーブル表示 */}
+      <div className="hidden md:block overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-[#6e6e73] text-xs border-b border-black/5">
+              <th className="py-2.5 pr-4 font-medium">検知日</th>
+              {showStock && <th className="py-2.5 pr-4 font-medium">銘柄</th>}
+              <th className="py-2.5 pr-4 font-medium">シグナル(状態)</th>
+              <th className="py-2.5 pr-4 font-medium">分類</th>
+              <th className="py-2.5 pr-4 font-medium">1営業日後</th>
+              <th className="py-2.5 pr-4 font-medium">2営業日後</th>
+              <th className="py-2.5 pr-4 font-medium">3営業日後</th>
+              <th className="py-2.5 font-medium">検知値</th>
+            </tr>
+          </thead>
+          <tbody>
+            {events.map((e) => {
+              const { close, rest } = parseDetail(e.detail);
+              return (
+                <tr key={e.id} className="border-b border-black/5 last:border-0">
+                  <td className="py-3 pr-4 whitespace-nowrap text-[#6e6e73]">
+                    {e.date}
                   </td>
-                )}
-                <td className="py-3 pr-4 font-medium" title={e.description}>
-                  {e.signal_name}
-                </td>
-                <td className="py-3 pr-4">
-                  <CategoryBadge category={e.category} />
-                </td>
-                <td className="py-3 pr-4 whitespace-nowrap">
-                  <Result pct={e.return_1d_pct} yen={e.return_1d_yen} />
-                </td>
-                <td className="py-3 pr-4 whitespace-nowrap">
-                  <Result pct={e.return_2d_pct} yen={e.return_2d_yen} />
-                </td>
-                <td className="py-3 pr-4 whitespace-nowrap">
-                  <Result pct={e.return_3d_pct} yen={e.return_3d_yen} />
-                </td>
-                <td className="py-3 text-[#6e6e73] text-xs">
-                  {close != null && (
-                    <span>終値 {close.toLocaleString()}円 </span>
+                  {showStock && (
+                    <td className="py-3 pr-4 whitespace-nowrap">
+                      <Link
+                        href={`/stocks/${e.code}`}
+                        className="text-[#0066cc] hover:underline"
+                      >
+                        {e.code} {e.stock_name}
+                      </Link>
+                    </td>
                   )}
-                  {formatDetail(rest)}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <p className="text-[11px] text-[#6e6e73] mt-3">
-        「N営業日後」は検知日終値からN営業日後終値までの実際の値動き(過去の事実)です。将来の値動きを保証・示唆するものではありません。
-      </p>
+                  <td className="py-3 pr-4 font-medium" title={e.description}>
+                    {e.signal_name}
+                  </td>
+                  <td className="py-3 pr-4">
+                    <CategoryBadge category={e.category} />
+                  </td>
+                  <td className="py-3 pr-4 whitespace-nowrap">
+                    <Result pct={e.return_1d_pct} yen={e.return_1d_yen} />
+                  </td>
+                  <td className="py-3 pr-4 whitespace-nowrap">
+                    <Result pct={e.return_2d_pct} yen={e.return_2d_yen} />
+                  </td>
+                  <td className="py-3 pr-4 whitespace-nowrap">
+                    <Result pct={e.return_3d_pct} yen={e.return_3d_yen} />
+                  </td>
+                  <td className="py-3 text-[#6e6e73] text-xs">
+                    {close != null && (
+                      <span>終値 {close.toLocaleString()}円 </span>
+                    )}
+                    {formatDetail(rest)}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      <p className="text-[11px] text-[#6e6e73] mt-3">{NOTE}</p>
     </div>
   );
 }

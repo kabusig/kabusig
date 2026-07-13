@@ -7,7 +7,7 @@ import { getViewer } from "@/lib/auth";
 export const dynamic = "force-dynamic";
 
 const CONFIRM_ITEMS: [string, string][] = [
-  ["サービス名", "株式指標ウォッチ プレミアム"],
+  ["サービス名", "カブシグナル プレミアム"],
   ["月額料金", "980円(税込)"],
   ["課金周期", "申込日に初回課金、以後毎月同日に自動更新・自動課金"],
   ["支払方法", "クレジットカード(Stripe)"],
