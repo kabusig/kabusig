@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <!-- グラファイト背景 -->
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3a3a3e"/>
+      <stop offset="45%" stop-color="#1c1c1f"/>
+      <stop offset="100%" stop-color="#0a0a0c"/>
+    </linearGradient>
+    <!-- クローム(金属)グラデーション -->
+    <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#dfe4ec"/>
+      <stop offset="50%" stop-color="#9aa3b2"/>
+      <stop offset="65%" stop-color="#e8ecf3"/>
+      <stop offset="100%" stop-color="#6f7885"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.10"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ベース -->
+  <rect width="64" height="64" rx="15" fill="url(#bg)"/>
+  <!-- 斜めの光沢 -->
+  <path d="M0 0 H40 L14 64 H0 Z" fill="url(#sheen)" clip-path="inset(0 round 15)"/>
+  <rect x="0.75" y="0.75" width="62.5" height="62.5" rx="14.25"
+        fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1.5"/>
+
+  <!-- 影(彫り込み感) -->
+  <path d="M14 45.5 L27 30.5 L34 37.5 L45 24.5"
+        fill="none" stroke="#000000" stroke-opacity="0.55"
+        stroke-width="7" stroke-linecap="round" stroke-linejoin="round"
+        transform="translate(0 1.8)"/>
+  <path d="M50.5 15.5 L51.5 27 L39.5 26.5 Z" fill="#000000" fill-opacity="0.55"
+        transform="translate(0 1.8)"/>
+
+  <!-- クロームの上昇ライン -->
+  <path d="M14 45.5 L27 30.5 L34 37.5 L45 24.5"
+        fill="none" stroke="url(#chrome)"
+        stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 矢先 -->
+  <path d="M50.5 15.5 L51.5 27 L39.5 26.5 Z" fill="url(#chrome)"/>
+</svg>

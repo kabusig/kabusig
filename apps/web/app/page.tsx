@@ -22,7 +22,7 @@ function fmtTime(iso: string | null): string {
 
 export default async function Dashboard() {
   const viewer = await getViewer();
-  const events = await recentSignalEvents(viewer.paid ? 15 : 5);
+  const events = await recentSignalEvents(viewer.paid ? 15 : 10);
   const resultEvents = viewer.paid ? await recentSignalEventsWithResult(15) : [];
   const calendar = await recentCalendarEvents(4);
   const news = await recentNews(9);
@@ -125,7 +125,7 @@ export default async function Dashboard() {
           {!viewer.paid && (
             <div className="mt-4 rounded-xl bg-gradient-to-br from-[#f5f5f7] to-[#e8f2ff] p-6 text-center">
               <p className="text-sm font-medium">
-                本日の検知 {todayCount.toLocaleString()} 件のうち 5
+                本日の検知 {todayCount.toLocaleString()} 件のうち 10
                 件を表示しています
               </p>
               <p className="text-xs text-[#6e6e73] mt-1">

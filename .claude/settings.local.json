@@ -9,7 +9,9 @@
       "PowerShell(.\\\\.venv\\\\Scripts\\\\python.exe -m pip install --quiet pandas numpy yfinance jpholiday pytest requests)",
       "PowerShell(.\\\\.venv\\\\Scripts\\\\python.exe -c \"import pandas, numpy, yfinance, jpholiday; print\\('ok'\\)\")",
       "PowerShell(git add -A)",
-      "Bash(python -)"
+      "Bash(python -)",
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\set_paid.py\")",
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\check_news.py\")"
     ]
   }
 }

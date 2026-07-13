@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getViewer } from "@/lib/auth";
 import { getSignalStats, latestSignalStats, countStocks } from "@/lib/data";
 import { BACKTEST_NOTE } from "@/lib/constants";
+import AdSlot from "@/components/AdSlot";
 
 export const dynamic = "force-dynamic";
 
@@ -205,6 +206,12 @@ export default async function PricingPage() {
           </Link>
           をご確認ください。
         </p>
+      </section>
+
+      {/* ページ下部の広告枠(三井住友カード等のアフィリエイトバナーを想定)。
+          A8.net 等で提携後、components/AdSlot.tsx の AD_SLOTS.footer にタグを設定。 */}
+      <section className="max-w-2xl mx-auto">
+        <AdSlot slot="footer" />
       </section>
     </div>
   );

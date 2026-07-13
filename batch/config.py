@@ -9,6 +9,17 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
 DATA_DIR.mkdir(exist_ok=True)
 
+# .env の読み込み(Webと同じ apps/web/.env.local を優先、なければ root/.env)。
+# CI や本番では環境変数が直接設定されるため、ファイルが無くても動く。
+try:
+    from dotenv import load_dotenv
+
+    for _envf in (ROOT / "apps" / "web" / ".env.local", ROOT / ".env"):
+        if _envf.exists():
+            load_dotenv(_envf)
+except ImportError:
+    pass
+
 # 'sqlite'(ローカル開発・フェーズ1) | 'supabase'(公開運用・フェーズ2以降)
 DATA_BACKEND = os.environ.get("DATA_BACKEND", "sqlite")
 SQLITE_PATH = os.environ.get("SQLITE_PATH", str(DATA_DIR / "local.db"))
