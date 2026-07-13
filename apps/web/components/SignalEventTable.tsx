@@ -2,6 +2,38 @@ import Link from "next/link";
 import type { SignalEvent } from "@/lib/db";
 import CategoryBadge from "./CategoryBadge";
 
+// 検知値の指標キーを日本語ラベルに変換(表示を分かりやすくする)
+const DETAIL_LABELS: Record<string, string> = {
+  rsi14: "RSI",
+  sma5: "5日線",
+  sma25: "25日線",
+  sma75: "75日線",
+  sma200: "200日線",
+  macd: "MACD",
+  macd_signal: "シグナル線",
+  bb_upper: "+2σ",
+  bb_lower: "-2σ",
+  stoch_k: "%K",
+  stoch_d: "%D",
+  kairi25: "25日線乖離率",
+  volume_ratio20: "出来高倍率",
+  tenkan: "転換線",
+  kijun: "基準線",
+};
+
+// 検知値を「ラベル 値」の読みやすい形に整形
+function formatDetail(rest: Record<string, number>): string {
+  return Object.entries(rest)
+    .map(([k, v]) => {
+      const label = DETAIL_LABELS[k] ?? k;
+      const num =
+        Math.abs(v) >= 100 ? Math.round(v).toLocaleString() : v.toFixed(2);
+      const unit = k === "kairi25" ? "%" : k === "volume_ratio20" ? "倍" : "";
+      return `${label} ${num}${unit}`;
+    })
+    .join(" / ");
+}
+
 function Result({
   pct,
   yen,
@@ -92,10 +124,10 @@ export default function SignalEventTable({
                   <Result pct={e.return_3d_pct} yen={e.return_3d_yen} />
                 </td>
                 <td className="py-3 text-[#6e6e73] text-xs">
-                  {close != null && <span>終値 {close}円 </span>}
-                  {Object.entries(rest)
-                    .map(([k, v]) => `${k}=${v}`)
-                    .join(" / ")}
+                  {close != null && (
+                    <span>終値 {close.toLocaleString()}円 </span>
+                  )}
+                  {formatDetail(rest)}
                 </td>
               </tr>
             );
