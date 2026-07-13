@@ -1,7 +1,10 @@
 // データアクセス層(フェーズ1: ローカルSQLite / フェーズ2: Supabaseに差し替え)
 // Node 24 標準の node:sqlite を使用(ネイティブ依存なし)
 // サーバーコンポーネント・Route Handler からのみ使用すること
-import { DatabaseSync } from "node:sqlite";
+//
+// 【Vercel対応】node:sqlite はローカル開発専用。本番(Supabase構成)では
+// getDb() は呼ばれないため、import を遅延させてビルド/起動を壊さないようにする。
+import type { DatabaseSync } from "node:sqlite";
 import path from "path";
 
 const DB_PATH =
@@ -12,9 +15,11 @@ let db: DatabaseSync | null = null;
 
 export function getDb(): DatabaseSync {
   if (!db) {
-    db = new DatabaseSync(DB_PATH, { readOnly: true });
+    // 遅延require(Supabase未設定のローカル開発時のみ実行される)
+    const sqlite = require("node:sqlite") as typeof import("node:sqlite");
+    db = new sqlite.DatabaseSync(DB_PATH, { readOnly: true });
   }
-  return db;
+  return db!;
 }
 
 // node:sqlite はnullプロトタイプの行を返すため、Client Component へ渡せる
