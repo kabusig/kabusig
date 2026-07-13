@@ -21,7 +21,8 @@
       "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\stripe_checkout_test.py\")",
       "PowerShell(cd C:\\\\Users\\\\ws2\\\\Desktop\\\\株システム; echo \"branch: $\\(git branch --show-current\\)\"; echo \"tracked files: $\\(\\(git ls-files | Measure-Object -Line\\).Lines\\)\"; echo \"--- largest tracked files ---\"; git ls-files | ForEach-Object { if \\(Test-Path $_\\) { [PSCustomObject]@{ KB = [math]::Round\\(\\(Get-Item $_\\).Length/1KB,1\\); F = $_ } } } | Sort-Object KB -Descending | Select-Object -First 5 | Format-Table -AutoSize)",
       "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\sb_progress.py\")",
-      "WebFetch(domain:kabusig.vercel.app)"
+      "WebFetch(domain:kabusig.vercel.app)",
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\sb_writetest.py\")"
     ]
   }
 }

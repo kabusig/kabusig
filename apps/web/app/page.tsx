@@ -10,6 +10,7 @@ import {
 } from "@/lib/data";
 import { ANOMALY_NOTE } from "@/lib/constants";
 import SignalEventTable from "@/components/SignalEventTable";
+import AdSlot from "@/components/AdSlot";
 import { getViewer } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -25,7 +26,7 @@ export default async function Dashboard() {
   const events = await recentSignalEvents(viewer.paid ? 15 : 10);
   const resultEvents = viewer.paid ? await recentSignalEventsWithResult(15) : [];
   const calendar = await recentCalendarEvents(4);
-  const news = await recentNews(9);
+  const news = await recentNews(12);
   const stockCount = await countStocks();
   const signalCount = (await listSignalTypes()).length;
   const { date: latestDate, count: todayCount } = await latestSignalStats();
@@ -76,22 +77,16 @@ export default async function Dashboard() {
             ニュースは収集バッチ実行後に表示されます。
           </p>
         ) : (
-          <div className="grid md:grid-cols-3 gap-3">
-            {news.map((n, i) => (
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {news.map((n) => (
               <a
                 key={n.id}
                 href={n.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`block bg-white rounded-2xl border border-black/5 shadow-sm p-5 hover:shadow-md hover:-translate-y-0.5 transition-all ${
-                  i === 0 ? "md:col-span-2 md:row-span-2" : ""
-                }`}
+                className="block bg-white rounded-2xl border border-black/5 shadow-sm p-5 hover:shadow-md hover:-translate-y-0.5 transition-all"
               >
-                <div
-                  className={`font-medium leading-snug ${
-                    i === 0 ? "text-xl" : "text-[14px]"
-                  }`}
-                >
+                <div className="font-medium leading-snug text-[14px]">
                   {n.title}
                 </div>
                 <div className="text-[11px] text-[#6e6e73] mt-2">
@@ -103,6 +98,9 @@ export default async function Dashboard() {
           </div>
         )}
       </section>
+
+      {/* 広告(A8等) */}
+      <AdSlot slot="signal_top" />
 
       {/* 本日のシグナル */}
       <section>

@@ -68,6 +68,9 @@ export default function RootLayout({
           <div className="max-w-6xl mx-auto px-6 py-8 text-[11px] leading-relaxed text-[#6e6e73] space-y-4">
             <p>{DISCLAIMER}</p>
             <div className="flex gap-5 flex-wrap border-t border-black/5 pt-4">
+              <Link href="/contact" className="hover:text-black">
+                お問い合わせ
+              </Link>
               <Link href="/legal/disclaimer" className="hover:text-black">
                 免責事項
               </Link>

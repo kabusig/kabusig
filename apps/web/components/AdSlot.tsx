@@ -12,6 +12,8 @@ const AD_SLOTS: Record<string, string | null> = {
   news_top: null, // 例: '<a href="..."><img src="..." /></a>'
   news_inline: null,
   sidebar: null,
+  // トップのシグナル検知の上(A8のバナーを想定)。
+  signal_top: null,
   // サイト全ページ下部の枠(三井住友カード等のバナーを想定)。
   // A8.net で広告主と提携し、発行されたタグをそのまま貼り付ける。
   footer: null,

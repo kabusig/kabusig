@@ -74,9 +74,20 @@ export default async function AccountPage() {
       </div>
 
       <div className="flex justify-between items-center">
-        <Link href="/settings" className="text-sm text-[#0066cc] hover:underline">
-          監視銘柄・通知設定 →
-        </Link>
+        <div className="flex gap-5">
+          <Link
+            href="/settings"
+            className="text-sm text-[#0066cc] hover:underline"
+          >
+            監視銘柄・通知設定 →
+          </Link>
+          <Link
+            href="/contact"
+            className="text-sm text-[#0066cc] hover:underline"
+          >
+            お問い合わせ →
+          </Link>
+        </div>
         <form action={signOut}>
           <button className="text-sm text-[#6e6e73] hover:text-black">
             ログアウト
