@@ -11,7 +11,11 @@
       "PowerShell(git add -A)",
       "Bash(python -)",
       "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\set_paid.py\")",
-      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\check_news.py\")"
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\check_news.py\")",
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\jquants_test.py\")",
+      "WebFetch(domain:jpx-jquants.com)",
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\jquants_v2_test.py\")",
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\jquants_v2_probe.py\")"
     ]
   }
 }

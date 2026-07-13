@@ -39,6 +39,11 @@ DISCLAIMER = (
     "投資判断はご自身の責任で行ってください。"
 )
 
-# J-Quants(フェーズ2)
-JQUANTS_REFRESH_TOKEN = os.environ.get("JQUANTS_REFRESH_TOKEN", "")
-JQUANTS_RATE_LIMIT_SEC = 13  # 無料プラン 5件/分 → 13秒間隔
+# J-Quants(フェーズ2、2024年以降のAPI v2)。
+# v2は APIキー方式(x-api-key ヘッダー)。旧 refresh token 方式は廃止。
+# 互換のため JQUANTS_REFRESH_TOKEN も APIキーとして受け付ける。
+JQUANTS_API_KEY = os.environ.get("JQUANTS_API_KEY", "") or \
+    os.environ.get("JQUANTS_REFRESH_TOKEN", "")
+JQUANTS_REFRESH_TOKEN = JQUANTS_API_KEY  # 後方互換
+JQUANTS_BASE = "https://api.jquants.com/v2"
+JQUANTS_RATE_LIMIT_SEC = 0.2  # 有料プラン。行儀よく間隔を空ける

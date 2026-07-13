@@ -1,8 +1,9 @@
-"""銘柄マスタ取得バッチ(JPX公式の上場銘柄一覧 → 東証プライム全銘柄)。
+"""銘柄マスタ取得バッチ(東証プライム全銘柄)。
 
-JPXが公開している「東証上場銘柄一覧」(data_j.xls)をダウンロードし、
-プライム市場の内国株式のみを stocks テーブルへ upsert する。
-取得失敗時は stocklist.STOCKS(主要45銘柄)にフォールバック。
+優先順位:
+1. J-Quants API v2 の equities/master(APIキー設定時。株価と同一ソースで整合)
+2. JPX公式の「東証上場銘柄一覧」(data_j.xls)
+3. stocklist.STOCKS(主要45銘柄・最終フォールバック)
 
 usage: python fetch_stocklist.py
 """
@@ -14,6 +15,7 @@ import sys
 import pandas as pd
 import requests
 
+import config
 import stocklist
 from storage import get_storage
 
@@ -24,6 +26,24 @@ JPX_URL = (
 
 # JPXの区分表記は全角括弧
 TARGET_SEGMENTS = ["プライム（内国株式）"]
+
+
+def fetch_jquants_list() -> list[tuple[str, str, str]]:
+    """J-Quants v2 equities/master からプライム普通株を取得。"""
+    r = requests.get(f"{config.JQUANTS_BASE}/equities/master",
+                     headers={"x-api-key": config.JQUANTS_API_KEY}, timeout=60)
+    r.raise_for_status()
+    rows = []
+    for m in r.json().get("data", []):
+        if m.get("MktNm") != "プライム":
+            continue
+        code = str(m.get("Code", ""))[:4]
+        name = m.get("CoName", "").strip()
+        if len(code) == 4 and code.isascii() and name:
+            rows.append((code, name, "プライム"))
+    # 同一4桁コードの重複を除去
+    dedup = {c: (c, n, mk) for c, n, mk in rows}
+    return sorted(dedup.values(), key=lambda x: x[0])
 
 
 def fetch_jpx_list() -> list[tuple[str, str, str]]:
@@ -53,12 +73,20 @@ def fetch_jpx_list() -> list[tuple[str, str, str]]:
 
 def main():
     storage = get_storage()
-    try:
-        rows = fetch_jpx_list()
-        print(f"JPX一覧取得: プライム {len(rows)} 銘柄")
-    except Exception as e:  # noqa: BLE001
-        print(f"JPX一覧取得失敗、フォールバック使用: {e}", file=sys.stderr)
-        rows = stocklist.STOCKS
+    rows = None
+    if config.JQUANTS_API_KEY:
+        try:
+            rows = fetch_jquants_list()
+            print(f"J-Quants master取得: プライム {len(rows)} 銘柄")
+        except Exception as e:  # noqa: BLE001
+            print(f"J-Quants master取得失敗: {e}", file=sys.stderr)
+    if not rows:
+        try:
+            rows = fetch_jpx_list()
+            print(f"JPX一覧取得: プライム {len(rows)} 銘柄")
+        except Exception as e:  # noqa: BLE001
+            print(f"JPX一覧取得失敗、フォールバック使用: {e}", file=sys.stderr)
+            rows = stocklist.STOCKS
     storage.upsert_stocks(rows)
     print(f"fetch_stocklist done: {len(rows)} stocks")
 

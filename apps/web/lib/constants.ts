@@ -1,5 +1,8 @@
 // サービス定数(法務ページ・フッターで一元利用)
-export const SERVICE_NAME = process.env.SERVICE_NAME ?? "株式指標ウォッチ";
+export const SERVICE_NAME = process.env.SERVICE_NAME ?? "カブシグ";
+// 正式名称(法務ページ等で使用)
+export const SERVICE_NAME_FULL =
+  process.env.SERVICE_NAME_FULL ?? "カブシグ（株式市場シグナルウォッチ）";
 export const OPERATOR_NAME = process.env.OPERATOR_NAME ?? "【運営者名】";
 export const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? "【連絡先メールアドレス】";
 
