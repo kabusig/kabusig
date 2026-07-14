@@ -12,9 +12,25 @@ async function signOut() {
   redirect("/");
 }
 
-export default async function AccountPage() {
+async function setPassword(formData: FormData) {
+  "use server";
+  const password = String(formData.get("password") ?? "");
+  if (password.length < 8) {
+    redirect("/account?pw=short");
+  }
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ password });
+  redirect(error ? "/account?pw=error" : "/account?pw=ok");
+}
+
+export default async function AccountPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ pw?: string }>;
+}) {
   const viewer = await getViewer();
   if (!viewer.loggedIn) redirect("/login");
+  const { pw } = await searchParams;
 
   return (
     <div className="max-w-lg mx-auto py-8 space-y-6">
@@ -71,6 +87,42 @@ export default async function AccountPage() {
             </form>
           </div>
         )}
+      </div>
+
+      {/* パスワード設定(設定すればメール不要でログイン可能に) */}
+      <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
+        <h2 className="text-sm font-semibold">パスワードの設定・変更</h2>
+        <p className="text-xs text-[#6e6e73] mt-1">
+          パスワードを設定すると、次回からメール不要でどの端末でもログインできます。
+        </p>
+        {pw === "ok" && (
+          <p className="text-xs text-[#0a7d43] bg-[#e6f7ee] rounded-lg px-3 py-2 mt-3">
+            パスワードを設定しました。次回から使えます。
+          </p>
+        )}
+        {pw === "short" && (
+          <p className="text-xs text-[#d70015] bg-[#fff0f0] rounded-lg px-3 py-2 mt-3">
+            パスワードは8文字以上で設定してください。
+          </p>
+        )}
+        {pw === "error" && (
+          <p className="text-xs text-[#d70015] bg-[#fff0f0] rounded-lg px-3 py-2 mt-3">
+            設定に失敗しました。時間をおいて再度お試しください。
+          </p>
+        )}
+        <form action={setPassword} className="flex gap-2 mt-3">
+          <input
+            type="password"
+            name="password"
+            required
+            minLength={8}
+            placeholder="新しいパスワード(8文字以上)"
+            className="flex-1 bg-[#f5f5f7] rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0071e3]/50"
+          />
+          <button className="bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-5 py-2.5 text-sm font-medium whitespace-nowrap transition-colors">
+            設定する
+          </button>
+        </form>
       </div>
 
       <div className="flex justify-between items-center">
