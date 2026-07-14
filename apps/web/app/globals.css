@@ -22,3 +22,11 @@ body {
   background: #0071e3;
   color: #fff;
 }
+
+/* 見出しの折り返しをバランスさせ、日本語で1文字だけ次行に落ちる崩れを防ぐ */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+

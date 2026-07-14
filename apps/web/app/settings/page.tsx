@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { createClient, supabaseConfigured } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/auth";
 import { listSignalTypes, searchStocks } from "@/lib/data";
-import { CATEGORY_LABELS } from "@/lib/constants";
 import Paywall from "@/components/Paywall";
+import SignalToggles from "./SignalToggles";
 
 export const dynamic = "force-dynamic";
 
@@ -35,24 +35,6 @@ async function removeFromWatchlist(formData: FormData) {
       .delete()
       .eq("user_id", user.id)
       .eq("code", code);
-  }
-  revalidatePath("/settings");
-}
-
-async function toggleSignal(formData: FormData) {
-  "use server";
-  const signalType = String(formData.get("signal_type") ?? "");
-  const enabled = formData.get("enabled") === "1";
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (user && signalType) {
-    await supabase.from("notification_settings").upsert({
-      user_id: user.id,
-      signal_type: signalType,
-      enabled: !enabled,
-    });
   }
   revalidatePath("/settings");
 }
@@ -196,41 +178,9 @@ export default async function SettingsPage({
           通知するシグナル
         </h2>
         <p className="text-xs text-[#6e6e73]">
-          チェックを外したシグナルは通知されません(表示には影響しません)。
+          タップで即座に切り替わります。外したシグナルは通知されません(表示には影響しません)。
         </p>
-        {["classic", "sakata", "legend"].map((cat) => (
-          <div key={cat}>
-            <h3 className="text-sm font-medium text-[#6e6e73] mb-2">
-              {CATEGORY_LABELS[cat]}
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {types
-                .filter((t) => t.category === cat)
-                .map((t) => {
-                  const enabled = !disabled.has(t.id);
-                  return (
-                    <form key={t.id} action={toggleSignal}>
-                      <input type="hidden" name="signal_type" value={t.id} />
-                      <input
-                        type="hidden"
-                        name="enabled"
-                        value={enabled ? "1" : "0"}
-                      />
-                      <button
-                        className={`text-xs rounded-full px-3.5 py-1.5 font-medium transition-colors ${
-                          enabled
-                            ? "bg-[#1d1d1f] text-white"
-                            : "bg-[#f5f5f7] text-[#6e6e73] line-through"
-                        }`}
-                      >
-                        {t.name}
-                      </button>
-                    </form>
-                  );
-                })}
-            </div>
-          </div>
-        ))}
+        <SignalToggles types={types} initialDisabled={[...disabled]} />
       </section>
     </div>
   );

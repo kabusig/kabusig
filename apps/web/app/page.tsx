@@ -63,7 +63,7 @@ export default async function Dashboard() {
       {/* ニュース(主役) */}
       <section>
         <div className="flex items-baseline justify-between mb-5">
-          <h2 className="text-3xl font-semibold tracking-tight">
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
             きょうのマーケット
           </h2>
           <Link
@@ -106,7 +106,7 @@ export default async function Dashboard() {
       {/* 本日のシグナル */}
       <section>
         <div className="flex items-baseline justify-between mb-5">
-          <h2 className="text-3xl font-semibold tracking-tight">
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
             シグナル検知
             <span className="text-sm font-normal text-[#6e6e73] ml-3">
               {latestDate ?? "-"} は {todayCount.toLocaleString()} 件
@@ -145,7 +145,7 @@ export default async function Dashboard() {
       {resultEvents.length > 0 && (
         <section>
           <div className="flex items-baseline justify-between mb-5">
-            <h2 className="text-3xl font-semibold tracking-tight">
+            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
               検知後の結果
               <span className="text-sm font-normal text-[#6e6e73] ml-3">
                 実績が確定した直近の検知(1〜3営業日後)
@@ -184,7 +184,7 @@ export default async function Dashboard() {
       {calendar.length > 0 && (
         <section>
           <div className="flex items-baseline justify-between mb-5">
-            <h2 className="text-3xl font-semibold tracking-tight">
+            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
               相場の暦
             </h2>
             <Link
