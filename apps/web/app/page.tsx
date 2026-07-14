@@ -24,7 +24,8 @@ function fmtTime(iso: string | null): string {
 export default async function Dashboard() {
   const viewer = await getViewer();
   const events = await recentSignalEvents(viewer.paid ? 15 : 10);
-  const resultEvents = viewer.paid ? await recentSignalEventsWithResult(15) : [];
+  // 無料ユーザーにも「検知後の結果」を見せる(1営業日後は表示、2〜3はロック=餌)
+  const resultEvents = await recentSignalEventsWithResult(15);
   const calendar = await recentCalendarEvents(4);
   const news = await recentNews(12);
   const stockCount = await countStocks();
@@ -158,7 +159,23 @@ export default async function Dashboard() {
             </Link>
           </div>
           <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
-            <SignalEventTable events={resultEvents} />
+            <SignalEventTable events={resultEvents} teaser={!viewer.paid} />
+            {!viewer.paid && (
+              <div className="mt-4 rounded-xl bg-gradient-to-br from-[#fff3e0] to-[#e8f2ff] p-6 text-center">
+                <p className="text-sm font-medium">
+                  🔒 2営業日後・3営業日後の結果はプレミアム会員限定
+                </p>
+                <p className="text-xs text-[#6e6e73] mt-1">
+                  各シグナルが検知後にどう動いたか、全期間の実績と統計をプレミアムで。
+                </p>
+                <Link
+                  href="/pricing"
+                  className="inline-block mt-3 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-6 py-2.5 text-sm font-medium transition-colors"
+                >
+                  プレミアムでできることを見る
+                </Link>
+              </div>
+            )}
           </div>
         </section>
       )}

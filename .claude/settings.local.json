@@ -33,7 +33,9 @@
       "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\resend_verify.py\" 2>&1)",
       "Bash(.venv/Scripts/python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\resend_poll.py\")",
       "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\gen_login.py\" 2>&1)",
-      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\make_checkout.py\")"
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\make_checkout.py\")",
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\line_test.py\")",
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe -c \"import os,requests; from dotenv import load_dotenv; load_dotenv\\(r'C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\apps\\\\web\\\\.env.local'\\); k=os.environ['RESEND_API_KEY']; H={'Authorization':f'Bearer {k}'}; d=requests.get\\('https://api.resend.com/domains',headers=H,timeout=30\\).json\\(\\)['data'][0]; print\\('Resend domain status:', d['status']\\)\")"
     ]
   }
 }

@@ -99,6 +99,29 @@ function ResultInline({
   );
 }
 
+// 無料ユーザー向け: 2〜3営業日後をロックしてプレミアム登録へ誘導
+function LockedCell() {
+  return (
+    <Link
+      href="/pricing"
+      className="inline-flex items-center gap-1 text-xs text-[#b25000] hover:underline whitespace-nowrap"
+    >
+      🔒 プレミアム
+    </Link>
+  );
+}
+
+function LockedInline({ label }: { label: string }) {
+  return (
+    <Link href="/pricing" className="flex flex-col items-center group">
+      <span className="text-[10px] text-[#6e6e73]">{label}</span>
+      <span className="text-[11px] text-[#b25000] group-hover:underline">
+        🔒
+      </span>
+    </Link>
+  );
+}
+
 const NOTE =
   "「N営業日後」は検知日終値からN営業日後終値までの実際の値動き(過去の事実)です。将来の値動きを保証・示唆するものではありません。";
 
@@ -106,10 +129,13 @@ export default function SignalEventTable({
   events,
   showStock = true,
   showResults = true,
+  teaser = false,
 }: {
   events: SignalEvent[];
   showStock?: boolean;
   showResults?: boolean;
+  // 無料ユーザー: 1営業日後のみ表示し、2〜3営業日後はプレミアム誘導
+  teaser?: boolean;
 }) {
   if (events.length === 0) {
     return <p className="text-[#6e6e73] text-sm">検知履歴はありません。</p>;
@@ -144,8 +170,17 @@ export default function SignalEventTable({
               {showResults && (
                 <div className="flex justify-around mt-3 border-t border-black/5 pt-3">
                   <ResultInline label="1営業日後" pct={e.return_1d_pct} yen={e.return_1d_yen} />
-                  <ResultInline label="2営業日後" pct={e.return_2d_pct} yen={e.return_2d_yen} />
-                  <ResultInline label="3営業日後" pct={e.return_3d_pct} yen={e.return_3d_yen} />
+                  {teaser ? (
+                    <>
+                      <LockedInline label="2営業日後" />
+                      <LockedInline label="3営業日後" />
+                    </>
+                  ) : (
+                    <>
+                      <ResultInline label="2営業日後" pct={e.return_2d_pct} yen={e.return_2d_yen} />
+                      <ResultInline label="3営業日後" pct={e.return_3d_pct} yen={e.return_3d_yen} />
+                    </>
+                  )}
                 </div>
               )}
               <div className="text-[11px] text-[#6e6e73] mt-2">
@@ -205,12 +240,25 @@ export default function SignalEventTable({
                       <td className="py-3 pr-4 whitespace-nowrap">
                         <Result pct={e.return_1d_pct} yen={e.return_1d_yen} />
                       </td>
-                      <td className="py-3 pr-4 whitespace-nowrap">
-                        <Result pct={e.return_2d_pct} yen={e.return_2d_yen} />
-                      </td>
-                      <td className="py-3 pr-4 whitespace-nowrap">
-                        <Result pct={e.return_3d_pct} yen={e.return_3d_yen} />
-                      </td>
+                      {teaser ? (
+                        <>
+                          <td className="py-3 pr-4 whitespace-nowrap">
+                            <LockedCell />
+                          </td>
+                          <td className="py-3 pr-4 whitespace-nowrap">
+                            <LockedCell />
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td className="py-3 pr-4 whitespace-nowrap">
+                            <Result pct={e.return_2d_pct} yen={e.return_2d_yen} />
+                          </td>
+                          <td className="py-3 pr-4 whitespace-nowrap">
+                            <Result pct={e.return_3d_pct} yen={e.return_3d_yen} />
+                          </td>
+                        </>
+                      )}
                     </>
                   )}
                   <td className="py-3 text-[#6e6e73] text-xs">
