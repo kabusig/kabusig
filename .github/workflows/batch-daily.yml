@@ -1,14 +1,19 @@
-# 平日 大引け後バッチ: 株価取得 → 指標計算 → シグナル判定 → Supabase同期 → 通知
-# JST 16:00 = UTC 07:00(GitHub Actions cron は UTC)
+# 平日 18:00 JST の日次バッチ:
+#   銘柄マスタ → 株価(J-Quants) → 指標 → シグナル検知 → 結果統計 → Supabase同期 → LINE通知
 #
-# アーキテクチャ: SQLite(data/local.db)を計算用の作業領域として
-# actions/cache で持ち回り、計算結果を push_supabase.py で配信用DBへ同期する。
+# 5年分の計算用SQLite(data/local.db)は actions/cache で持ち回る。
+# 初回(キャッシュなし)は全履歴を取得し、以後は当日分だけ取得して差分更新する。
+# 18:00 JST = 09:00 UTC
 name: batch-daily
 
 on:
   schedule:
-    - cron: "0 7 * * 1-5"
+    - cron: "0 9 * * 1-5"
   workflow_dispatch:
+
+concurrency:
+  group: batch-daily
+  cancel-in-progress: false
 
 jobs:
   daily:
@@ -29,39 +34,42 @@ jobs:
           key: stockdb-${{ github.run_id }}
           restore-keys: stockdb-
 
-      - name: Run pipeline
+      - name: Run daily pipeline
         working-directory: batch
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          JQUANTS_API_KEY: ${{ secrets.JQUANTS_API_KEY }}
           LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          LINE_DEV_USER_ID: ${{ secrets.LINE_DEV_USER_ID }}
-          JQUANTS_REFRESH_TOKEN: ${{ secrets.JQUANTS_REFRESH_TOKEN }}
-          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_APP_URL: https://kabusig.com
         run: |
+          set -e
+          TODAY=$(TZ=Asia/Tokyo date +%Y-%m-%d)
+          echo "対象日(JST): $TODAY"
           python fetch_stocklist.py
-          # 初回(キャッシュなし)は2年分、以後は直近3ヶ月を差分更新
-          if [ -f ../data/local.db ]; then PERIOD=3mo; else PERIOD=2y; fi
-          python fetch_prices.py --bulk --period $PERIOD
-          python calc_indicators.py
-          python detect_signals.py
+
+          # 履歴の有無で全取得/差分取得を切り替え(100MB未満なら初回とみなす)
+          if [ -f ../data/local.db ] && [ "$(stat -c%s ../data/local.db)" -gt 100000000 ]; then
+            echo "=== 差分更新(当日分) ==="
+            python fetch_prices_jquants.py --date "$TODAY"
+            python calc_indicators.py
+            python detect_signals.py --date "$TODAY"
+          else
+            echo "=== 初回:全履歴を構築 ==="
+            python fetch_prices_jquants.py --bulk
+            python calc_indicators.py
+            python detect_signals.py --backfill
+          fi
+
           python calc_signal_results.py
-          python fetch_news.py
+          python push_supabase.py
 
-      - name: Push to Supabase
-        if: ${{ vars.PUSH_SUPABASE == 'true' }}
-        working-directory: batch
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-        run: python push_supabase.py
-
-      - name: Send notifications (paid members)
-        if: ${{ vars.PUSH_SUPABASE == 'true' }}
+      - name: Send LINE notifications (paid members)
+        if: ${{ vars.SEND_LINE == 'true' }}
         working-directory: batch
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           LINE_CHANNEL_ACCESS_TOKEN: ${{ secrets.LINE_CHANNEL_ACCESS_TOKEN }}
-          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+          NEXT_PUBLIC_APP_URL: https://kabusig.com
         run: python send_notifications.py --members
