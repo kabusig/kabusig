@@ -3,6 +3,7 @@ import { listSignalTypes, getSignalStatDetail } from "@/lib/data";
 import { getViewer } from "@/lib/auth";
 import { BACKTEST_NOTE } from "@/lib/constants";
 import Paywall from "@/components/Paywall";
+import NotifyButton from "@/components/NotifyButton";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +41,9 @@ export default async function BacktestPage({
         <p className="text-xs text-[#6e6e73] mt-3 bg-[#f5f5f7] rounded-xl px-4 py-3">
           {BACKTEST_NOTE}
         </p>
+        <div className="mt-4">
+          <NotifyButton />
+        </div>
       </div>
 
       <form

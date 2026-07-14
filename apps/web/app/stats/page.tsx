@@ -4,6 +4,7 @@ import { getViewer } from "@/lib/auth";
 import Paywall from "@/components/Paywall";
 import { BACKTEST_NOTE } from "@/lib/constants";
 import CategoryBadge from "@/components/CategoryBadge";
+import NotifyButton from "@/components/NotifyButton";
 
 export const dynamic = "force-dynamic";
 
@@ -52,6 +53,9 @@ export default async function StatsPage({
           {BACKTEST_NOTE}
           市場全体が上昇した期間の統計は全シグナルが高めに出る等、期間の影響を受けます。
         </p>
+        <div className="mt-4">
+          <NotifyButton />
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-6 items-center">

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/auth";
+import NotifyButton from "@/components/NotifyButton";
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +16,12 @@ async function signOut() {
 async function setPassword(formData: FormData) {
   "use server";
   const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
   if (password.length < 8) {
     redirect("/account?pw=short");
+  }
+  if (password !== confirm) {
+    redirect("/account?pw=mismatch");
   }
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({ password });
@@ -35,6 +40,17 @@ export default async function AccountPage({
   return (
     <div className="max-w-lg mx-auto py-8 space-y-6">
       <h1 className="text-3xl font-semibold tracking-tight">アカウント</h1>
+
+      {/* 監視銘柄・通知設定への目立つ導線 */}
+      <div className="bg-gradient-to-br from-[#e6f7ee] to-[#e8f2ff] rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="text-center sm:text-left">
+          <div className="text-sm font-semibold">監視銘柄とLINE通知の設定</div>
+          <div className="text-xs text-[#6e6e73] mt-0.5">
+            気になる銘柄を登録して、シグナルをLINEで受け取りましょう。
+          </div>
+        </div>
+        <NotifyButton />
+      </div>
 
       {viewer.devMode && (
         <p className="text-xs text-[#b25000] bg-[#fff3e0] rounded-xl p-3">
@@ -105,41 +121,46 @@ export default async function AccountPage({
             パスワードは8文字以上で設定してください。
           </p>
         )}
+        {pw === "mismatch" && (
+          <p className="text-xs text-[#d70015] bg-[#fff0f0] rounded-lg px-3 py-2 mt-3">
+            パスワードと確認用パスワードが一致しません。
+          </p>
+        )}
         {pw === "error" && (
           <p className="text-xs text-[#d70015] bg-[#fff0f0] rounded-lg px-3 py-2 mt-3">
             設定に失敗しました。時間をおいて再度お試しください。
           </p>
         )}
-        <form action={setPassword} className="flex gap-2 mt-3">
+        <form action={setPassword} className="space-y-2 mt-3">
           <input
             type="password"
             name="password"
             required
             minLength={8}
             placeholder="新しいパスワード(8文字以上)"
-            className="flex-1 bg-[#f5f5f7] rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0071e3]/50"
+            className="w-full bg-[#f5f5f7] rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0071e3]/50"
           />
-          <button className="bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-5 py-2.5 text-sm font-medium whitespace-nowrap transition-colors">
-            設定する
+          <input
+            type="password"
+            name="confirm"
+            required
+            minLength={8}
+            placeholder="確認のためもう一度入力"
+            className="w-full bg-[#f5f5f7] rounded-full px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0071e3]/50"
+          />
+          <button className="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-5 py-2.5 text-sm font-medium transition-colors">
+            パスワードを設定する
           </button>
         </form>
       </div>
 
       <div className="flex justify-between items-center">
-        <div className="flex gap-5">
-          <Link
-            href="/settings"
-            className="text-sm text-[#0066cc] hover:underline"
-          >
-            監視銘柄・通知設定 →
-          </Link>
-          <Link
-            href="/contact"
-            className="text-sm text-[#0066cc] hover:underline"
-          >
-            お問い合わせ →
-          </Link>
-        </div>
+        <Link
+          href="/contact"
+          className="text-sm text-[#0066cc] hover:underline"
+        >
+          お問い合わせ →
+        </Link>
         <form action={signOut}>
           <button className="text-sm text-[#6e6e73] hover:text-black">
             ログアウト

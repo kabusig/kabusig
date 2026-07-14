@@ -110,12 +110,6 @@ def anomalies_for_date(d: date) -> list[dict]:
         add("rule_45days", "「45日ルール」の暦日",
             "本日は四半期末の45日前にあたり、ヘッジファンドの解約通知期限(いわゆる45日ルール)とされる暦日です。")
 
-    # 満月・新月アノマリー
-    phase = moon_phase(d)
-    if phase:
-        add("moon_phase", f"本日は{phase}です",
-            f"本日は{phase}(月齢{moon_age(d):.1f})です。月の満ち欠けと相場を関連付けるアノマリーが古くから語られています。")
-
     # 干支の相場格言(大発会=年始最初の営業日)
     if d.month == 1 and d == next_business_day(date(d.year, 1, 4)):
         eto = eto_of_year(d.year)

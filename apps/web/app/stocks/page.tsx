@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { countStocks, searchStocks } from "@/lib/data";
+import NotifyButton from "@/components/NotifyButton";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,9 @@ export default async function StocksPage({
           東証プライム全{total.toLocaleString()}
           銘柄を監視しています。並び順は証券コード順です。
         </p>
+        <div className="mt-4">
+          <NotifyButton />
+        </div>
       </div>
 
       <form method="get" className="flex gap-3">

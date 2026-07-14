@@ -38,20 +38,6 @@ def test_rule_45days():
         assert any(e["event_type"] == "rule_45days" for e in events)
 
 
-def test_moon_phase_cycle():
-    """朔望月周期内に新月・満月が各1回以上検出される。"""
-    from datetime import timedelta
-    phases = set()
-    d = date(2026, 7, 1)
-    for _ in range(31):
-        p = anomalies.moon_phase(d)
-        if p:
-            phases.add(p)
-        d += timedelta(days=1)
-    assert "新月" in phases
-    assert "満月" in phases
-
-
 def test_all_bodies_have_note():
     """全アノマリー本文に「将来を示唆しない」旨の注記が含まれる。"""
     from datetime import timedelta

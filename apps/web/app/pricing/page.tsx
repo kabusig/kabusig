@@ -80,7 +80,7 @@ export default async function PricingPage() {
 
       {/* 会員が見られるもの */}
       <section>
-        <h2 className="text-3xl font-semibold tracking-tight text-center mb-8">
+        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-center text-balance mb-8">
           プレミアム会員が見られるもの
         </h2>
         <div className="grid md:grid-cols-3 gap-4">
