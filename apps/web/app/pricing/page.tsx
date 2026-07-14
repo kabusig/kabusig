@@ -54,8 +54,8 @@ export default async function PricingPage() {
         <div className="text-xs font-medium text-[#b25000] bg-[#fff3e0] rounded-full px-4 py-1.5 inline-block">
           プレミアム
         </div>
-        <h1 className="text-5xl font-semibold tracking-tight mt-5 bg-gradient-to-br from-[#1d1d1f] to-[#6e6e73] bg-clip-text text-transparent pb-1">
-          市場のすべてを、この一画面に。
+        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-balance mt-5 bg-gradient-to-br from-[#1d1d1f] to-[#6e6e73] bg-clip-text text-transparent pb-1">
+          市場のすべてを この一画面に。
         </h1>
         <p className="text-lg text-[#6e6e73] mt-4 leading-relaxed">
           プランはひとつだけ。登録すれば、東証プライム

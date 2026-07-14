@@ -36,8 +36,8 @@ export default async function Dashboard() {
     <div className="space-y-16">
       {/* ヒーロー */}
       <section className="text-center pt-4">
-        <h1 className="text-5xl md:text-6xl font-semibold tracking-tight bg-gradient-to-br from-[#1d1d1f] via-[#1d1d1f] to-[#6e6e73] bg-clip-text text-transparent pb-1">
-          市場を、事実で見る。
+        <h1 className="text-4xl md:text-6xl font-semibold tracking-tight text-balance bg-gradient-to-br from-[#1d1d1f] via-[#1d1d1f] to-[#6e6e73] bg-clip-text text-transparent pb-1">
+          市場を 事実で見る。
         </h1>
         <p className="text-lg text-[#6e6e73] mt-4 max-w-xl mx-auto leading-relaxed">
           東証プライム{stockCount.toLocaleString()}銘柄 ×{" "}
