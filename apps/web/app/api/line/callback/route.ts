@@ -5,7 +5,10 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function GET(request: Request) {
-  const { origin, searchParams } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
+  // 認可時と同じredirect_uriを使う必要があるため、APP_URLで統一
+  const origin =
+    process.env.NEXT_PUBLIC_APP_URL ?? new URL(request.url).origin;
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const cookieStore = await cookies();
