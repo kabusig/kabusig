@@ -3,7 +3,7 @@ export const SERVICE_NAME = process.env.SERVICE_NAME ?? "カブシグナル";
 // 正式名称(法務ページ等で使用)
 export const SERVICE_NAME_FULL =
   process.env.SERVICE_NAME_FULL ?? "カブシグナル（株式市場シグナルウォッチ）";
-export const OPERATOR_NAME = process.env.OPERATOR_NAME ?? "【運営者名】";
+export const OPERATOR_NAME = process.env.OPERATOR_NAME ?? "フジワラ";
 export const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? "admin@kabusig.com";
 
 // 全ページフッター・全通知に表示する固定免責文言(変更禁止)

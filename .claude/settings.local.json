@@ -24,7 +24,16 @@
       "WebFetch(domain:kabusig.vercel.app)",
       "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\sb_writetest.py\")",
       "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\verify_slim.py\")",
-      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\check_returns.py\")"
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\check_returns.py\")",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" https://kabusig.com/)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code} -> %{redirect_url}\\\\n\" https://www.kabusig.com/)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" -X POST https://kabusig.com/api/stripe-webhook -H \"Content-Type: application/json\" -d '{}')",
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\resend_records.py\")",
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\resend_verify.py\")",
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\resend_verify.py\" 2>&1)",
+      "Bash(.venv/Scripts/python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\resend_poll.py\")",
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\gen_login.py\" 2>&1)",
+      "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\make_checkout.py\")"
     ]
   }
 }
