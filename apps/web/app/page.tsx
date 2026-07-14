@@ -119,7 +119,7 @@ export default async function Dashboard() {
           </Link>
         </div>
         <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
-          <SignalEventTable events={events} />
+          <SignalEventTable events={events} showResults={false} />
           {!viewer.paid && (
             <div className="mt-4 rounded-xl bg-gradient-to-br from-[#f5f5f7] to-[#e8f2ff] p-6 text-center">
               <p className="text-sm font-medium">

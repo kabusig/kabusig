@@ -105,9 +105,11 @@ const NOTE =
 export default function SignalEventTable({
   events,
   showStock = true,
+  showResults = true,
 }: {
   events: SignalEvent[];
   showStock?: boolean;
+  showResults?: boolean;
 }) {
   if (events.length === 0) {
     return <p className="text-[#6e6e73] text-sm">検知履歴はありません。</p>;
@@ -139,11 +141,13 @@ export default function SignalEventTable({
               <div className="text-[15px] font-semibold mt-1">
                 {e.signal_name}
               </div>
-              <div className="flex justify-around mt-3 border-t border-black/5 pt-3">
-                <ResultInline label="1営業日後" pct={e.return_1d_pct} yen={e.return_1d_yen} />
-                <ResultInline label="2営業日後" pct={e.return_2d_pct} yen={e.return_2d_yen} />
-                <ResultInline label="3営業日後" pct={e.return_3d_pct} yen={e.return_3d_yen} />
-              </div>
+              {showResults && (
+                <div className="flex justify-around mt-3 border-t border-black/5 pt-3">
+                  <ResultInline label="1営業日後" pct={e.return_1d_pct} yen={e.return_1d_yen} />
+                  <ResultInline label="2営業日後" pct={e.return_2d_pct} yen={e.return_2d_yen} />
+                  <ResultInline label="3営業日後" pct={e.return_3d_pct} yen={e.return_3d_yen} />
+                </div>
+              )}
               <div className="text-[11px] text-[#6e6e73] mt-2">
                 {close != null && <span>終値 {close.toLocaleString()}円 </span>}
                 {formatDetail(rest)}
@@ -162,9 +166,13 @@ export default function SignalEventTable({
               {showStock && <th className="py-2.5 pr-4 font-medium">銘柄</th>}
               <th className="py-2.5 pr-4 font-medium">シグナル(状態)</th>
               <th className="py-2.5 pr-4 font-medium">分類</th>
-              <th className="py-2.5 pr-4 font-medium">1営業日後</th>
-              <th className="py-2.5 pr-4 font-medium">2営業日後</th>
-              <th className="py-2.5 pr-4 font-medium">3営業日後</th>
+              {showResults && (
+                <>
+                  <th className="py-2.5 pr-4 font-medium">1営業日後</th>
+                  <th className="py-2.5 pr-4 font-medium">2営業日後</th>
+                  <th className="py-2.5 pr-4 font-medium">3営業日後</th>
+                </>
+              )}
               <th className="py-2.5 font-medium">検知値</th>
             </tr>
           </thead>
@@ -192,15 +200,19 @@ export default function SignalEventTable({
                   <td className="py-3 pr-4">
                     <CategoryBadge category={e.category} />
                   </td>
-                  <td className="py-3 pr-4 whitespace-nowrap">
-                    <Result pct={e.return_1d_pct} yen={e.return_1d_yen} />
-                  </td>
-                  <td className="py-3 pr-4 whitespace-nowrap">
-                    <Result pct={e.return_2d_pct} yen={e.return_2d_yen} />
-                  </td>
-                  <td className="py-3 pr-4 whitespace-nowrap">
-                    <Result pct={e.return_3d_pct} yen={e.return_3d_yen} />
-                  </td>
+                  {showResults && (
+                    <>
+                      <td className="py-3 pr-4 whitespace-nowrap">
+                        <Result pct={e.return_1d_pct} yen={e.return_1d_yen} />
+                      </td>
+                      <td className="py-3 pr-4 whitespace-nowrap">
+                        <Result pct={e.return_2d_pct} yen={e.return_2d_yen} />
+                      </td>
+                      <td className="py-3 pr-4 whitespace-nowrap">
+                        <Result pct={e.return_3d_pct} yen={e.return_3d_yen} />
+                      </td>
+                    </>
+                  )}
                   <td className="py-3 text-[#6e6e73] text-xs">
                     {close != null && (
                       <span>終値 {close.toLocaleString()}円 </span>
@@ -214,7 +226,9 @@ export default function SignalEventTable({
         </table>
       </div>
 
-      <p className="text-[11px] text-[#6e6e73] mt-3">{NOTE}</p>
+      {showResults && (
+        <p className="text-[11px] text-[#6e6e73] mt-3">{NOTE}</p>
+      )}
     </div>
   );
 }
