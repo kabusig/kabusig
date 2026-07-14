@@ -3,10 +3,10 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
-  // コールバックはLINEに登録した公開URLと完全一致させる必要があるため、
-  // request.url由来のorigin(Vercel内部URLになることがある)ではなくAPP_URLを使う
-  const base =
-    process.env.NEXT_PUBLIC_APP_URL ?? new URL(request.url).origin;
+  // コールバックはLINE登録の公開URLと完全一致が必要。実際のアクセス先ホスト名
+  // (kabusig.com)から組み立てる(Vercel内部URLや環境変数のズレを避ける)
+  const host = request.headers.get("host") || "kabusig.com";
+  const base = `${host.includes("localhost") ? "http" : "https"}://${host}`;
   const supabase = await createClient();
   const {
     data: { user },
