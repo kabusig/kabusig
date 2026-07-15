@@ -1,0 +1,15 @@
+# 依存パッケージの脆弱性を自動検知(週次)。セキュリティ更新を自動でPR化する。
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/apps/web"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "pip"
+    directory: "/batch"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
