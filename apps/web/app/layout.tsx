@@ -4,13 +4,50 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { DISCLAIMER, SERVICE_NAME, SERVICE_NAME_FULL } from "@/lib/constants";
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://kabusig.com";
+const DESCRIPTION =
+  "東証プライム全銘柄のテクニカル指標・シグナル検知・過去統計を毎日機械的にチェックする株式情報ツール「カブシグナル」。経済ニュースまとめも無料で閲覧できます。";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(APP_URL),
   title: {
     default: `${SERVICE_NAME} | 株式市場シグナルウォッチ`,
     template: `%s | ${SERVICE_NAME}`,
   },
-  description:
-    "東証プライム全銘柄のテクニカル指標・シグナル検知・決算スケジュールを機械的に通知する情報ツール「カブシグナル」",
+  description: DESCRIPTION,
+  applicationName: SERVICE_NAME,
+  keywords: [
+    "株",
+    "東証プライム",
+    "テクニカル指標",
+    "シグナル",
+    "株価チャート",
+    "経済ニュース",
+    "カブシグナル",
+  ],
+  alternates: { canonical: "/" },
+  openGraph: {
+    type: "website",
+    siteName: SERVICE_NAME,
+    title: `${SERVICE_NAME} | 株式市場シグナルウォッチ`,
+    description: DESCRIPTION,
+    url: APP_URL,
+    locale: "ja_JP",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SERVICE_NAME} | 株式市場シグナルウォッチ`,
+    description: DESCRIPTION,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
+  // Google Search Console のHTML metaタグ検証コード(Vercel env で設定)
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
 
 const NAV = [
