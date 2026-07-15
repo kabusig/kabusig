@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getViewer } from "@/lib/auth";
-import SubmitButton from "../login/SubmitButton";
+import CheckoutButton from "./CheckoutButton";
 
 export const dynamic = "force-dynamic";
 
@@ -65,9 +65,7 @@ export default async function SubscribePage({
       </div>
 
       <form action="/api/checkout" method="post" className="space-y-3">
-        <SubmitButton pendingLabel="決済ページへ移動中…">
-          上記に同意して決済へ進む(Stripe)
-        </SubmitButton>
+        <CheckoutButton>上記に同意して決済へ進む(Stripe)</CheckoutButton>
         <p className="text-[11px] text-[#6e6e73] text-center">
           <Link href="/legal/tokushoho" className="text-[#0066cc] hover:underline">
             特定商取引法に基づく表記
