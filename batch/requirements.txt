@@ -6,4 +6,4 @@ requests>=2.32
 python-dotenv>=1.0
 feedparser>=6.0
 xlrd>=2.0
-pytest>=8.0
+pytest>=9.1.1
