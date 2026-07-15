@@ -1,41 +1,38 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { setSignalEnabled } from "./actions";
+import { setSignalMode, type SignalMode } from "./actions";
 import { CATEGORY_LABELS } from "@/lib/constants";
 
 type Sig = { id: string; name: string; category: string };
 
 const CATEGORY_ORDER = ["classic", "sakata", "legend"];
+const MODES: { key: SignalMode; label: string }[] = [
+  { key: "off", label: "しない" },
+  { key: "watch", label: "監視のみ" },
+  { key: "all", label: "全銘柄" },
+];
 
 export default function SignalToggles({
   types,
-  initialDisabled,
+  initialModes,
 }: {
   types: Sig[];
-  initialDisabled: string[];
+  initialModes: Record<string, SignalMode>;
 }) {
   // タップで即座に見た目を反映し、保存はバックグラウンドで行う
-  const [disabled, setDisabled] = useState<Set<string>>(
-    new Set(initialDisabled)
-  );
+  const [modes, setModes] = useState<Record<string, SignalMode>>(initialModes);
   const [, startTransition] = useTransition();
 
-  const toggle = (id: string) => {
-    const willEnable = disabled.has(id); // 現在OFF → ONにする
-    setDisabled((prev) => {
-      const next = new Set(prev);
-      if (willEnable) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  const setMode = (id: string, mode: SignalMode) => {
+    setModes((prev) => ({ ...prev, [id]: mode }));
     startTransition(() => {
-      setSignalEnabled(id, willEnable);
+      setSignalMode(id, mode);
     });
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {CATEGORY_ORDER.filter((cat) =>
         types.some((t) => t.category === cat)
       ).map((cat) => (
@@ -43,24 +40,41 @@ export default function SignalToggles({
           <h3 className="text-sm font-medium text-[#6e6e73] mb-2">
             {CATEGORY_LABELS[cat]}
           </h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="space-y-1.5">
             {types
               .filter((t) => t.category === cat)
               .map((t) => {
-                const enabled = !disabled.has(t.id);
+                const mode = modes[t.id] ?? "watch";
                 return (
-                  <button
+                  <div
                     key={t.id}
-                    type="button"
-                    onClick={() => toggle(t.id)}
-                    className={`text-xs rounded-full px-3.5 py-1.5 font-medium transition-colors ${
-                      enabled
-                        ? "bg-[#1d1d1f] text-white"
-                        : "bg-[#f5f5f7] text-[#6e6e73] line-through"
-                    }`}
+                    className="flex items-center justify-between gap-3 bg-white rounded-xl border border-black/5 px-4 py-2"
                   >
-                    {t.name}
-                  </button>
+                    <span className="text-sm">{t.name}</span>
+                    <div className="flex rounded-full bg-[#f5f5f7] p-0.5 shrink-0">
+                      {MODES.map((m) => {
+                        const active = mode === m.key;
+                        const activeColor =
+                          m.key === "all"
+                            ? "bg-[#0071e3] text-white"
+                            : m.key === "watch"
+                              ? "bg-[#1d1d1f] text-white"
+                              : "bg-[#8e8e93] text-white";
+                        return (
+                          <button
+                            key={m.key}
+                            type="button"
+                            onClick={() => setMode(t.id, m.key)}
+                            className={`text-xs rounded-full px-3 py-1 font-medium transition-colors ${
+                              active ? activeColor : "text-[#6e6e73]"
+                            }`}
+                          >
+                            {m.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 );
               })}
           </div>

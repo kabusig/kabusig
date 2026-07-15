@@ -2,8 +2,11 @@
 
 import { createClient } from "@/lib/supabase/server";
 
-// 通知シグナルのON/OFFを保存(ページ全体の再描画はしない=即応)
-export async function setSignalEnabled(signalType: string, enabled: boolean) {
+export type SignalMode = "off" | "watch" | "all";
+
+// シグナルの通知範囲を保存(ページ全体の再描画はしない=即応)
+// off=通知しない / watch=監視銘柄のみ / all=全銘柄
+export async function setSignalMode(signalType: string, mode: SignalMode) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -12,6 +15,7 @@ export async function setSignalEnabled(signalType: string, enabled: boolean) {
   await supabase.from("notification_settings").upsert({
     user_id: user.id,
     signal_type: signalType,
-    enabled,
+    enabled: mode !== "off",
+    all_stocks: mode === "all",
   });
 }

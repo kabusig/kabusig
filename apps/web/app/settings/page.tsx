@@ -6,6 +6,7 @@ import { getViewer } from "@/lib/auth";
 import { listSignalTypes, searchStocks } from "@/lib/data";
 import Paywall from "@/components/Paywall";
 import SignalToggles from "./SignalToggles";
+import type { SignalMode } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -59,7 +60,7 @@ export default async function SettingsPage({
   const types = await listSignalTypes();
 
   let watchlist: { code: string; name: string }[] = [];
-  let disabled = new Set<string>();
+  const modeMap: Record<string, SignalMode> = {};
   if (supabaseConfigured()) {
     const supabase = await createClient();
     const { data: wl } = await supabase
@@ -73,9 +74,14 @@ export default async function SettingsPage({
     }));
     const { data: ns } = await supabase
       .from("notification_settings")
-      .select("signal_type, enabled")
-      .eq("enabled", false);
-    disabled = new Set((ns ?? []).map((n) => n.signal_type));
+      .select("signal_type, enabled, all_stocks");
+    for (const n of ns ?? []) {
+      modeMap[n.signal_type] = !n.enabled
+        ? "off"
+        : n.all_stocks
+          ? "all"
+          : "watch";
+    }
   }
 
   const searchResults = q ? await searchStocks(q, 10) : [];
@@ -177,10 +183,21 @@ export default async function SettingsPage({
         <h2 className="text-xl font-semibold tracking-tight">
           通知するシグナル
         </h2>
-        <p className="text-xs text-[#6e6e73]">
-          タップで即座に切り替わります。外したシグナルは通知されません(表示には影響しません)。
-        </p>
-        <SignalToggles types={types} initialDisabled={[...disabled]} />
+        <div className="text-xs text-[#6e6e73] space-y-1 bg-[#f5f5f7] rounded-xl px-4 py-3">
+          <p>タップで即座に切り替わります(表示には影響しません)。</p>
+          <p>
+            <span className="font-medium text-[#1d1d1f]">監視のみ</span>
+            = 上の監視銘柄で検知したときだけ通知 /
+            <span className="font-medium text-[#0071e3]"> 全銘柄</span>
+            = 監視銘柄に関係なく、その1シグナルが東証プライム全銘柄で出たら通知 /
+            <span className="font-medium"> しない</span>
+            = 通知しない
+          </p>
+          <p className="text-[#b25000]">
+            ※「全銘柄」は発生頻度の高いシグナルだと通知が非常に多くなります。ゴールデンクロス等の高頻度シグナルより、発生の少ないシグナル向けです。
+          </p>
+        </div>
+        <SignalToggles types={types} initialModes={modeMap} />
       </section>
     </div>
   );

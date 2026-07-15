@@ -75,12 +75,21 @@ def notify_members(storage, events: list[dict]) -> None:
     for u in users:
         watch = {w["code"] for w in sb.select(
             "watchlists", f"select=code&user_id=eq.{u['id']}")}
-        disabled = {s["signal_type"] for s in sb.select(
+        settings = sb.select(
             "notification_settings",
-            f"select=signal_type&user_id=eq.{u['id']}&enabled=eq.false")}
+            f"select=signal_type,enabled,all_stocks&user_id=eq.{u['id']}")
+        # enabled=false は通知しない。all_stocks=true は監視銘柄外でも通知する。
+        disabled = {s["signal_type"] for s in settings
+                    if not s.get("enabled", True)}
+        all_stocks = {s["signal_type"] for s in settings
+                      if s.get("all_stocks")}
         sent = 0
         for ev in events:
-            if ev["code"] not in watch or ev["signal_type"] in disabled:
+            st = ev["signal_type"]
+            if st in disabled:
+                continue
+            # 全銘柄通知シグナル以外は、監視銘柄のみが対象
+            if st not in all_stocks and ev["code"] not in watch:
                 continue
             if not storage.log_notification(u["id"], ev["id"]):
                 continue  # 送信済み(冪等)
