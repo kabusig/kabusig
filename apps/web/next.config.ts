@@ -4,6 +4,10 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: path.resolve(__dirname, "..", ".."),
+  // OGP画像生成で使う日本語フォントをサーバーレス関数に同梱する
+  outputFileTracingIncludes: {
+    "/opengraph-image": ["./app/_og/**"],
+  },
   // セキュリティヘッダー(クリックジャッキング・MIMEスニッフィング・HTTPS強制等)
   async headers() {
     return [
