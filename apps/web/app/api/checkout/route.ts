@@ -22,16 +22,28 @@ export async function POST(request: Request) {
     .eq("id", user.id)
     .single();
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    line_items: [{ price: process.env.STRIPE_PRICE_ID_MONTHLY, quantity: 1 }],
-    customer: profile?.stripe_customer_id || undefined,
-    customer_email: profile?.stripe_customer_id ? undefined : user.email,
-    client_reference_id: user.id,
-    subscription_data: { metadata: { user_id: user.id } },
-    success_url: `${origin}/account?subscribed=1`,
-    cancel_url: `${origin}/subscribe`,
-    locale: "ja",
-  });
-  return NextResponse.redirect(session.url!, 303);
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      line_items: [
+        { price: process.env.STRIPE_PRICE_ID_MONTHLY, quantity: 1 },
+      ],
+      customer: profile?.stripe_customer_id || undefined,
+      customer_email: profile?.stripe_customer_id ? undefined : user.email,
+      client_reference_id: user.id,
+      subscription_data: { metadata: { user_id: user.id } },
+      success_url: `${origin}/account?subscribed=1`,
+      cancel_url: `${origin}/subscribe`,
+      locale: "ja",
+    });
+    return NextResponse.redirect(session.url!, 303);
+  } catch (e) {
+    // 500 の白画面ではなく、原因を確認画面に表示する
+    const msg = e instanceof Error ? e.message : "決済の開始に失敗しました";
+    console.error("[checkout] stripe error:", msg, e);
+    return NextResponse.redirect(
+      `${origin}/subscribe?error=${encodeURIComponent(msg)}`,
+      303
+    );
+  }
 }

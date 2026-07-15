@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getViewer } from "@/lib/auth";
+import SubmitButton from "../login/SubmitButton";
 
 export const dynamic = "force-dynamic";
 
@@ -19,10 +20,16 @@ const CONFIRM_ITEMS: [string, string][] = [
   ],
 ];
 
-export default async function SubscribePage() {
+export default async function SubscribePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   const viewer = await getViewer();
   if (!viewer.loggedIn) redirect("/login");
   if (viewer.paid && !viewer.devMode) redirect("/account");
+
+  const { error } = await searchParams;
 
   return (
     <div className="max-w-lg mx-auto py-8 space-y-6">
@@ -32,6 +39,15 @@ export default async function SubscribePage() {
       <p className="text-sm text-[#6e6e73] text-center">
         以下の内容をご確認のうえ、決済へお進みください。
       </p>
+
+      {error && (
+        <div className="text-sm text-[#d70015] bg-[#fff0f0] rounded-xl p-4">
+          決済を開始できませんでした。時間をおいて再度お試しください。
+          <span className="block mt-1 text-[11px] text-[#6e6e73] break-all">
+            詳細: {error}
+          </span>
+        </div>
+      )}
 
       <div className="bg-white rounded-2xl border border-black/5 shadow-sm">
         <table className="w-full text-sm">
@@ -49,12 +65,9 @@ export default async function SubscribePage() {
       </div>
 
       <form action="/api/checkout" method="post" className="space-y-3">
-        <button
-          type="submit"
-          className="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-6 py-3.5 text-sm font-medium transition-colors"
-        >
+        <SubmitButton pendingLabel="決済ページへ移動中…">
           上記に同意して決済へ進む(Stripe)
-        </button>
+        </SubmitButton>
         <p className="text-[11px] text-[#6e6e73] text-center">
           <Link href="/legal/tokushoho" className="text-[#0066cc] hover:underline">
             特定商取引法に基づく表記
