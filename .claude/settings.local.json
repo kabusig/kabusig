@@ -53,7 +53,8 @@
       "Bash(curl -sL \"http://localhost:3000/login?mode=magic\")",
       "Bash(git add *)",
       "Bash(git commit -q -m '@ *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(npm install *)"
     ]
   }
 }
