@@ -44,7 +44,11 @@
       "PowerShell(& C:\\\\Users\\\\ws2\\\\Desktop\\\\���V�X�e��\\\\.venv\\\\Scripts\\\\python.exe \"C:\\\\Users\\\\ws2\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-ws2-Desktop------\\\\2a6dd213-f339-4997-8bb1-8d6104b000e0\\\\scratchpad\\\\line_push_member.py\")",
       "Bash(python -m pytest tests/test_forbidden_words.py -q)",
       "Bash(python tests/test_forbidden_words.py)",
-      "Bash(python -c \"import test_forbidden_words as t; t.test_no_forbidden_words_in_sources\\(\\); t.test_signal_definitions_are_neutral\\(\\); t.test_disclaimer_is_intact\\(\\); print\\('OK: all forbidden-word tests passed'\\)\")"
+      "Bash(python -c \"import test_forbidden_words as t; t.test_no_forbidden_words_in_sources\\(\\); t.test_signal_definitions_are_neutral\\(\\); t.test_disclaimer_is_intact\\(\\); print\\('OK: all forbidden-word tests passed'\\)\")",
+      "Bash(npm run *)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(python -c \"import sys,re; h=sys.stdin.read\\(\\); m=h.split\\('平均騰落率が高いシグナル'\\)[1][:1200] if '平均騰落率が高いシグナル' in h else ''; print\\('rank1 name+value visible:', bool\\(re.search\\(r'children.:.?[0-9-]+\\\\.[0-9]+.,..%', m\\)\\) \\); import re; names=re.findall\\(r'leading-snug\\( blur-sm[^\\\\\"]*\\)?\\\\\\\\\\\\\",\\\\\\\\\\\\\"children\\\\\\\\\\\\\":\\\\\\\\\\\\\"\\([^\\\\\\\\\\\\\"]+\\)\\\\\\\\\\\\\"', m\\); print\\('first rows:', names[:3]\\)\")",
+      "Bash(awk -F'@@@' 'NF>1{print $2}')"
     ]
   }
 }

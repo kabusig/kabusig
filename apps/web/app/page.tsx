@@ -9,8 +9,9 @@ import {
   listSignalTypes,
   getSignalStats,
 } from "@/lib/data";
-import { ANOMALY_NOTE, BACKTEST_NOTE } from "@/lib/constants";
+import { ANOMALY_NOTE } from "@/lib/constants";
 import SignalEventTable from "@/components/SignalEventTable";
+import SignalRankTeaser from "@/components/SignalRankTeaser";
 import AdSlot from "@/components/AdSlot";
 import { getViewer } from "@/lib/auth";
 
@@ -32,9 +33,11 @@ export default async function Dashboard() {
   const stockCount = await countStocks();
   const signalCount = (await listSignalTypes()).length;
   const { date: latestDate, count: todayCount } = await latestSignalStats();
-  // 上昇割合が高いシグナル(過去統計・3営業日後)。サンプル数が極端に少ないものは除外。
-  const allStats = await getSignalStats(3, "up_ratio");
-  const topUp = allStats.filter((s) => s.count >= 20).slice(0, 5);
+  // 上昇割合・平均騰落率が高いシグナル(過去統計・3営業日後)。サンプル数が極端に少ないものは除外。
+  const upStats = await getSignalStats(3, "up_ratio");
+  const topUp = upStats.filter((s) => s.count >= 20).slice(0, 5);
+  const meanStats = await getSignalStats(3, "mean");
+  const topMean = meanStats.filter((s) => s.count >= 20).slice(0, 5);
 
   return (
     <div className="space-y-16">
@@ -146,79 +149,22 @@ export default async function Dashboard() {
       </section>
 
       {/* 上昇割合が高いシグナル(過去統計・餌) */}
-      {topUp.length > 0 && (
-        <section>
-          <div className="flex items-baseline justify-between mb-5">
-            <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
-              上昇割合が高いシグナル
-              <span className="text-sm font-normal text-[#6e6e73] ml-3">
-                過去統計・3営業日後
-              </span>
-            </h2>
-            <Link href="/stats" className="text-sm text-[#0066cc] hover:underline">
-              統計をすべて見る →
-            </Link>
-          </div>
-          <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-6">
-            <div className="divide-y divide-black/5">
-              {topUp.map((s, i) => {
-                const locked = !viewer.paid && i > 0;
-                return (
-                  <div
-                    key={s.signal_type}
-                    className="flex items-center gap-4 py-3"
-                  >
-                    <span className="w-6 text-lg font-semibold text-[#6e6e73] tabular-nums shrink-0">
-                      {i + 1}
-                    </span>
-                    <span
-                      className={`flex-1 font-medium leading-snug ${
-                        locked ? "blur-sm select-none" : ""
-                      }`}
-                    >
-                      {s.signal_name}
-                    </span>
-                    {locked ? (
-                      <span className="text-sm text-[#6e6e73] shrink-0">
-                        🔒 会員限定
-                      </span>
-                    ) : (
-                      <span className="text-right tabular-nums shrink-0">
-                        <span className="font-semibold">
-                          {s.up_ratio_pct.toFixed(1)}%
-                        </span>
-                        <span className="text-xs text-[#6e6e73] ml-2">
-                          {s.count.toLocaleString()}回
-                        </span>
-                      </span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-            {!viewer.paid && (
-              <div className="mt-4 rounded-xl bg-gradient-to-br from-[#f5f5f7] to-[#e8f2ff] p-6 text-center">
-                <p className="text-sm font-medium">
-                  🔒 2位以下のシグナル名・上昇割合・発生回数はプレミアム会員限定
-                </p>
-                <p className="text-xs text-[#6e6e73] mt-1">
-                  全シグナルの発生回数・上昇割合・平均騰落率を、期間を切り替えて閲覧できます。
-                </p>
-                <Link
-                  href="/pricing"
-                  className="inline-block mt-3 bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-6 py-2.5 text-sm font-medium transition-colors"
-                >
-                  プレミアムでできることを見る
-                </Link>
-              </div>
-            )}
-            <p className="text-[11px] text-[#6e6e73] mt-4">
-              上昇した割合の降順です。特定のシグナルの利用をすすめるものではありません。
-              {BACKTEST_NOTE}
-            </p>
-          </div>
-        </section>
-      )}
+      <SignalRankTeaser
+        title="上昇割合が高いシグナル"
+        subtitle="過去統計・3営業日後"
+        rows={topUp}
+        metric="up_ratio"
+        paid={viewer.paid}
+      />
+
+      {/* 平均騰落率が高いシグナル(過去統計・餌) */}
+      <SignalRankTeaser
+        title="平均騰落率が高いシグナル"
+        subtitle="過去統計・3営業日後"
+        rows={topMean}
+        metric="mean"
+        paid={viewer.paid}
+      />
 
       {/* 結果が確定した検知 */}
       {resultEvents.length > 0 && (
