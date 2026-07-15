@@ -54,7 +54,9 @@
       "Bash(git add *)",
       "Bash(git commit -q -m '@ *)",
       "Bash(git push *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(grep -oE \"[A-Z_]{4,}\")",
+      "Bash(python -c \"import test_forbidden_words as t; t.test_no_forbidden_words_in_sources\\(\\); t.test_signal_definitions_are_neutral\\(\\); t.test_disclaimer_is_intact\\(\\); print\\('forbidden tests OK \\(docs excluded\\)'\\)\")"
     ]
   }
 }

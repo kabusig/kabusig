@@ -16,8 +16,12 @@ FORBIDDEN = [
 
 TARGET_SUFFIXES = {".py", ".ts", ".tsx", ".html", ".sql", ".yml", ".yaml", ".md"}
 EXCLUDE_PARTS = {"node_modules", ".next", ".venv", "tests", ".git", "data"}
-# 開発指示書自体は NG 表現の説明を含むため除外
-EXCLUDE_NAMES = {"株式指標通知サービス_開発指示書.md"}
+# 指示書は NG 表現の説明・広告文例を含むため除外
+EXCLUDE_NAMES = {
+    "株式指標通知サービス_開発指示書.md",
+    "広告運用指示書.md",
+    "開発継続指示書.md",
+}
 
 
 def iter_targets():
