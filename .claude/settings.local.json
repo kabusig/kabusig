@@ -48,7 +48,12 @@
       "Bash(npm run *)",
       "Bash(curl -s http://localhost:3000/)",
       "Bash(python -c \"import sys,re; h=sys.stdin.read\\(\\); m=h.split\\('平均騰落率が高いシグナル'\\)[1][:1200] if '平均騰落率が高いシグナル' in h else ''; print\\('rank1 name+value visible:', bool\\(re.search\\(r'children.:.?[0-9-]+\\\\.[0-9]+.,..%', m\\)\\) \\); import re; names=re.findall\\(r'leading-snug\\( blur-sm[^\\\\\"]*\\)?\\\\\\\\\\\\\",\\\\\\\\\\\\\"children\\\\\\\\\\\\\":\\\\\\\\\\\\\"\\([^\\\\\\\\\\\\\"]+\\)\\\\\\\\\\\\\"', m\\); print\\('first rows:', names[:3]\\)\")",
-      "Bash(awk -F'@@@' 'NF>1{print $2}')"
+      "Bash(awk -F'@@@' 'NF>1{print $2}')",
+      "Bash(curl -s -o /dev/null -w \"code=%{http_code} redirect=%{redirect_url}\\\\n\" \"http://localhost:3000/login?mode=magic\")",
+      "Bash(curl -sL \"http://localhost:3000/login?mode=magic\")",
+      "Bash(git add *)",
+      "Bash(git commit -q -m '@ *)",
+      "Bash(git push *)"
     ]
   }
 }

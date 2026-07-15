@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient, supabaseConfigured } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/auth";
+import SubmitButton from "./SubmitButton";
 
 export const dynamic = "force-dynamic";
 
@@ -101,12 +102,9 @@ export default async function LoginPage({
                 placeholder="mail@example.com"
                 className="w-full bg-white border border-black/10 rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0071e3]/50"
               />
-              <button
-                type="submit"
-                className="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-6 py-3 text-sm font-medium transition-colors"
-              >
+              <SubmitButton pendingLabel="送信中…">
                 ログインリンクを送信
-              </button>
+              </SubmitButton>
             </form>
           )}
           <p className="text-center mt-6 text-sm">
@@ -137,12 +135,7 @@ export default async function LoginPage({
               placeholder="パスワード"
               className="w-full bg-white border border-black/10 rounded-full px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0071e3]/50"
             />
-            <button
-              type="submit"
-              className="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-6 py-3 text-sm font-medium transition-colors"
-            >
-              ログイン
-            </button>
+            <SubmitButton pendingLabel="ログイン中…">ログイン</SubmitButton>
           </form>
           <div className="mt-6 text-center text-sm text-[#6e6e73] space-y-1">
             <p>
