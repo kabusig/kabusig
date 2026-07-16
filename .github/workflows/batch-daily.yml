@@ -29,7 +29,7 @@ jobs:
       - run: pip install -r batch/requirements.txt
 
       - name: Restore SQLite cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: data/local.db
           key: stockdb-${{ github.run_id }}
