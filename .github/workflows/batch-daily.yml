@@ -3,12 +3,13 @@
 #
 # 5年分の計算用SQLite(data/local.db)は actions/cache で持ち回る。
 # 初回(キャッシュなし)は全履歴を取得し、以後は当日分だけ取得して差分更新する。
-# 18:00 JST = 09:00 UTC
+#
+# 【起動方法】GitHub の schedule は混雑時に数時間遅延・スキップされるため使わない。
+# 時刻の正確な Vercel Cron(/api/cron/batch, 平日 18:00 JST)から workflow_dispatch で起動する。
+# 手動実行も Actions 画面の "Run workflow" から可能。
 name: batch-daily
 
 on:
-  schedule:
-    - cron: "0 9 * * 1-5"
   workflow_dispatch:
 
 concurrency:
