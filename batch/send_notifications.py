@@ -42,6 +42,26 @@ def build_signal_message(ev: dict) -> str:
     return "\n".join(lines)
 
 
+def build_digest_message(events: list[dict], max_items: int = 30) -> str:
+    """会員宛の当日シグナルを1通にまとめる(LINE通数枠の節約)。"""
+    ev_date = events[0].get("date", "")
+    n = len(events)
+    lines = [
+        f"【カブシグナル｜本日のシグナル検知】{ev_date}",
+        f"監視条件に一致した検知が {n} 件あります。",
+        "──────────",
+    ]
+    for ev in events[:max_items]:
+        lines.append(f"・{ev['code']} {ev['stock_name']}: {ev['signal_name']}")
+    if n > max_items:
+        lines.append(f"…ほか {n - max_items} 件")
+    lines.append("──────────")
+    lines.append(f"詳細: {config.APP_URL}")
+    lines.append("")
+    lines.append(config.DISCLAIMER)
+    return "\n".join(lines)
+
+
 def push_line(user_id: str, text: str, max_retry: int = 3) -> bool:
     if not config.LINE_CHANNEL_ACCESS_TOKEN:
         print("--- dry-run(LINE_CHANNEL_ACCESS_TOKEN 未設定)---")
@@ -83,7 +103,9 @@ def notify_members(storage, events: list[dict]) -> None:
                     if not s.get("enabled", True)}
         all_stocks = {s["signal_type"] for s in settings
                       if s.get("all_stocks")}
-        sent = 0
+        # その会員宛の未送信シグナルを集め、1通のLINEにまとめて送る
+        # (1銘柄1通だとLINEのメッセージ通数枠をすぐ使い切るため)
+        to_send = []
         for ev in events:
             st = ev["signal_type"]
             if st in disabled:
@@ -93,10 +115,11 @@ def notify_members(storage, events: list[dict]) -> None:
                 continue
             if not storage.log_notification(u["id"], ev["id"]):
                 continue  # 送信済み(冪等)
-            if push_line(u["line_user_id"], build_signal_message(ev)):
-                sent += 1
-        if sent:
-            print(f"  {u['id'][:8]}...: {sent} sent")
+            to_send.append(ev)
+        if not to_send:
+            continue
+        if push_line(u["line_user_id"], build_digest_message(to_send)):
+            print(f"  {u['id'][:8]}...: {len(to_send)} signals in 1 message")
 
 
 def main():
