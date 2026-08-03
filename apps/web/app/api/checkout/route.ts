@@ -5,6 +5,10 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   const { origin } = new URL(request.url);
+  // 決済代行の切替中は新規課金を停止(準備中ページへ)
+  if (process.env.PAYMENTS_ENABLED !== "true") {
+    return NextResponse.redirect(`${origin}/subscribe`, 303);
+  }
   if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_PRICE_ID_MONTHLY) {
     return NextResponse.redirect(
       `${origin}/subscribe?error=stripe_not_configured`, 303);

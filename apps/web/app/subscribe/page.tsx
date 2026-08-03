@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getViewer } from "@/lib/auth";
+import { PAYMENTS_ENABLED, CONTACT_EMAIL } from "@/lib/constants";
 import CheckoutButton from "./CheckoutButton";
 
 export const dynamic = "force-dynamic";
@@ -30,6 +31,46 @@ export default async function SubscribePage({
   if (viewer.paid && !viewer.devMode) redirect("/account");
 
   const { error } = await searchParams;
+
+  // 決済代行の切替中は「準備中」を表示(新規課金を停止)
+  if (!PAYMENTS_ENABLED) {
+    return (
+      <div className="max-w-lg mx-auto py-16 text-center space-y-5">
+        <div className="text-4xl">🛠️</div>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          ただいまお申し込みを準備中です
+        </h1>
+        <p className="text-sm text-[#6e6e73] leading-relaxed">
+          決済システムのメンテナンス・切替のため、プレミアムの新規お申し込みを
+          一時停止しています。準備が整い次第、再開いたします。ご不便をおかけします。
+        </p>
+        <p className="text-sm text-[#6e6e73]">
+          その間も、ニュースまとめや一部の機能は引き続きご利用いただけます。
+        </p>
+        <div className="flex gap-3 justify-center pt-2">
+          <Link
+            href="/"
+            className="bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-6 py-2.5 text-sm font-medium transition-colors"
+          >
+            トップへ戻る
+          </Link>
+          <Link
+            href="/news"
+            className="bg-[#f5f5f7] hover:bg-[#e8e8ed] rounded-full px-6 py-2.5 text-sm font-medium transition-colors"
+          >
+            ニュースを見る
+          </Link>
+        </div>
+        <p className="text-xs text-[#6e6e73] pt-2">
+          再開のお知らせをご希望の方は{" "}
+          <a href={`mailto:${CONTACT_EMAIL}`} className="text-[#0066cc] hover:underline">
+            {CONTACT_EMAIL}
+          </a>{" "}
+          までご連絡ください。
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-lg mx-auto py-8 space-y-6">

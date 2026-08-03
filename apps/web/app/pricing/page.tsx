@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getViewer } from "@/lib/auth";
 import { getSignalStats, latestSignalStats, countStocks } from "@/lib/data";
-import { BACKTEST_NOTE } from "@/lib/constants";
+import { BACKTEST_NOTE, PAYMENTS_ENABLED } from "@/lib/constants";
 import AdSlot from "@/components/AdSlot";
 
 export const dynamic = "force-dynamic";
@@ -66,15 +66,23 @@ export default async function PricingPage() {
           <span className="text-[#6e6e73] ml-1.5">円/月(税込)</span>
         </div>
         <div className="flex gap-3 justify-center mt-6">
-          <Link
-            href={ctaHref}
-            className="bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-8 py-3.5 text-sm font-medium transition-colors"
-          >
-            プレミアムに登録する
-          </Link>
+          {PAYMENTS_ENABLED ? (
+            <Link
+              href={ctaHref}
+              className="bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-8 py-3.5 text-sm font-medium transition-colors"
+            >
+              プレミアムに登録する
+            </Link>
+          ) : (
+            <span className="bg-[#f5f5f7] text-[#6e6e73] rounded-full px-8 py-3.5 text-sm font-medium cursor-default">
+              ただいまお申し込み準備中です
+            </span>
+          )}
         </div>
         <p className="text-xs text-[#6e6e73] mt-3">
-          いつでも解約可能・解約後は課金期間末日まで利用可・日割返金なし
+          {PAYMENTS_ENABLED
+            ? "いつでも解約可能・解約後は課金期間末日まで利用可・日割返金なし"
+            : "決済システムの切替のため、新規お申し込みを一時停止しています。準備が整い次第、再開します。"}
         </p>
       </section>
 
@@ -182,12 +190,18 @@ export default async function PricingPage() {
           ))}
         </div>
         <div className="text-center mt-8">
-          <Link
-            href={ctaHref}
-            className="bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-8 py-3.5 text-sm font-medium transition-colors"
-          >
-            プレミアムに登録する
-          </Link>
+          {PAYMENTS_ENABLED ? (
+            <Link
+              href={ctaHref}
+              className="bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-8 py-3.5 text-sm font-medium transition-colors"
+            >
+              プレミアムに登録する
+            </Link>
+          ) : (
+            <span className="bg-[#f5f5f7] text-[#6e6e73] rounded-full px-8 py-3.5 text-sm font-medium cursor-default">
+              ただいまお申し込み準備中です
+            </span>
+          )}
         </div>
       </section>
 

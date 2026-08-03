@@ -6,6 +6,10 @@ export const SERVICE_NAME_FULL =
 export const OPERATOR_NAME = process.env.OPERATOR_NAME ?? "フジワラ";
 export const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? "admin@kabusig.com";
 
+// 決済の受付可否。決済代行の切替中は false(準備中表示)。
+// 新しい決済を導入したら Vercel env PAYMENTS_ENABLED=true で再開する。
+export const PAYMENTS_ENABLED = process.env.PAYMENTS_ENABLED === "true";
+
 // 全ページフッター・全通知に表示する固定免責文言(変更禁止)
 export const DISCLAIMER =
   "本サービスが提供する情報はテクニカル指標等の機械的な計算結果および公開情報であり、" +
