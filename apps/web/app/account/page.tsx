@@ -38,9 +38,41 @@ export default async function AccountPage({
   if (!viewer.loggedIn) redirect("/login");
   const { pw } = await searchParams;
 
+  // 確認待ちの振込申込があるか(お振込みのお願いを表示)
+  let hasPendingOrder = false;
+  if (!viewer.devMode) {
+    const sb = await createClient();
+    const {
+      data: { user },
+    } = await sb.auth.getUser();
+    if (user) {
+      const { data } = await sb
+        .from("membership_orders")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("status", "pending")
+        .limit(1);
+      hasPendingOrder = Boolean(data && data.length > 0);
+    }
+  }
+
   return (
     <div className="max-w-lg mx-auto py-8 space-y-6">
       <h1 className="text-3xl font-semibold tracking-tight">アカウント</h1>
+
+      {hasPendingOrder && (
+        <Link
+          href="/subscribe"
+          className="block bg-[#fff8e6] border border-[#f0d98a] rounded-2xl p-5 hover:bg-[#fff3d6] transition-colors"
+        >
+          <div className="text-sm font-semibold text-[#8a6d00]">
+            お振込みが未確認です
+          </div>
+          <div className="text-xs text-[#8a6d00] mt-0.5">
+            年会費のお振込みがまだ確認できていません。振込先・識別コードを確認する →
+          </div>
+        </Link>
+      )}
 
       {/* 監視銘柄・通知設定への目立つ導線 */}
       <div className="bg-gradient-to-br from-[#e6f7ee] to-[#e8f2ff] rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-3">
