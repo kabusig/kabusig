@@ -89,9 +89,13 @@ def notify_members(storage, events: list[dict]) -> None:
     """フェーズ2: Supabase上の有料会員へ、監視銘柄×通知設定で絞って送信。"""
     from supabase_client import SupabaseClient
     sb = SupabaseClient()
+    # 年会費(期限)対応: 期限未設定 or 期限が今日以降の有料会員のみ
+    today = date.today().strftime("%Y-%m-%d")
     users = sb.select(
-        "profiles", "select=id,line_user_id&plan=eq.paid&line_user_id=not.is.null")
-    print(f"paid members with LINE: {len(users)}")
+        "profiles",
+        "select=id,line_user_id&plan=eq.paid&line_user_id=not.is.null"
+        f"&or=(paid_until.is.null,paid_until.gte.{today})")
+    print(f"active paid members with LINE: {len(users)}")
     for u in users:
         watch = {w["code"] for w in sb.select(
             "watchlists", f"select=code&user_id=eq.{u['id']}")}

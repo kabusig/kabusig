@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getViewer } from "@/lib/auth";
+import { PAYMENTS_ENABLED } from "@/lib/constants";
 import NotifyButton from "@/components/NotifyButton";
 
 export const dynamic = "force-dynamic";
@@ -66,9 +67,16 @@ export default async function AccountPage({
         <div className="px-6 py-4 flex justify-between items-center">
           <span className="text-sm text-[#6e6e73]">プラン</span>
           {viewer.paid ? (
-            <span className="text-xs font-medium text-[#0a7d43] bg-[#e6f7ee] rounded-full px-3 py-1">
-              プレミアム
-            </span>
+            <div className="text-right">
+              <span className="text-xs font-medium text-[#0a7d43] bg-[#e6f7ee] rounded-full px-3 py-1">
+                プレミアム
+              </span>
+              {viewer.paidUntil && (
+                <div className="text-[11px] text-[#6e6e73] mt-1">
+                  有効期限: {viewer.paidUntil}
+                </div>
+              )}
+            </div>
           ) : (
             <Link
               href="/subscribe"
@@ -93,7 +101,7 @@ export default async function AccountPage({
             </a>
           )}
         </div>
-        {viewer.paid && (
+        {viewer.paid && PAYMENTS_ENABLED && (
           <div className="px-6 py-4 flex justify-between items-center">
             <span className="text-sm text-[#6e6e73]">お支払い・解約</span>
             <form action="/api/portal" method="post">

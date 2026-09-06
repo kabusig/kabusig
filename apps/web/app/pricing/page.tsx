@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { getViewer } from "@/lib/auth";
 import { getSignalStats, latestSignalStats, countStocks } from "@/lib/data";
-import { BACKTEST_NOTE, PAYMENTS_ENABLED } from "@/lib/constants";
+import {
+  BACKTEST_NOTE,
+  PAYMENTS_ENABLED,
+  BANK_TRANSFER_ENABLED,
+  ANNUAL_FEE_YEN,
+} from "@/lib/constants";
 import AdSlot from "@/components/AdSlot";
 
 export const dynamic = "force-dynamic";
@@ -46,6 +51,9 @@ export default async function PricingPage() {
   // サンプル統計(紹介用に3件だけ表示)
   const sampleStats = (await getSignalStats(3, "up_ratio")).slice(0, 3);
   const ctaHref = viewer.loggedIn ? "/subscribe" : "/login";
+  const joinable = PAYMENTS_ENABLED || BANK_TRANSFER_ENABLED;
+  const bankMode = BANK_TRANSFER_ENABLED && !PAYMENTS_ENABLED;
+  const ctaLabel = bankMode ? "年会費プランに申し込む" : "プレミアムに登録する";
 
   return (
     <div className="space-y-16">
@@ -62,16 +70,27 @@ export default async function PricingPage() {
           {stockCount.toLocaleString()}銘柄 × 33シグナルのすべてが見られます。
         </p>
         <div className="mt-7">
-          <span className="text-5xl font-semibold tracking-tight">980</span>
-          <span className="text-[#6e6e73] ml-1.5">円/月(税込)</span>
+          {bankMode ? (
+            <>
+              <span className="text-5xl font-semibold tracking-tight">
+                {ANNUAL_FEE_YEN.toLocaleString()}
+              </span>
+              <span className="text-[#6e6e73] ml-1.5">円/年(税込)</span>
+            </>
+          ) : (
+            <>
+              <span className="text-5xl font-semibold tracking-tight">980</span>
+              <span className="text-[#6e6e73] ml-1.5">円/月(税込)</span>
+            </>
+          )}
         </div>
         <div className="flex gap-3 justify-center mt-6">
-          {PAYMENTS_ENABLED ? (
+          {joinable ? (
             <Link
               href={ctaHref}
               className="bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-8 py-3.5 text-sm font-medium transition-colors"
             >
-              プレミアムに登録する
+              {ctaLabel}
             </Link>
           ) : (
             <span className="bg-[#f5f5f7] text-[#6e6e73] rounded-full px-8 py-3.5 text-sm font-medium cursor-default">
@@ -82,7 +101,9 @@ export default async function PricingPage() {
         <p className="text-xs text-[#6e6e73] mt-3">
           {PAYMENTS_ENABLED
             ? "いつでも解約可能・解約後は課金期間末日まで利用可・日割返金なし"
-            : "決済システムの切替のため、新規お申し込みを一時停止しています。準備が整い次第、再開します。"}
+            : bankMode
+              ? "銀行振込による年額プランです。1回のお振込みで1年間ご利用いただけます。"
+              : "決済手段の切替のため、新規お申し込みを一時停止しています。準備が整い次第、再開します。"}
         </p>
       </section>
 
@@ -172,7 +193,9 @@ export default async function PricingPage() {
         <div className="space-y-3">
           {[
             ["1", "メールアドレスでログイン", "ログイン用リンクが届きます。パスワードは不要です。"],
-            ["2", "申込内容を確認して決済", "クレジットカード(Stripe)で月額980円。確認画面で内容を明示します。"],
+            bankMode
+              ? ["2", "年会費をお振込み", `お申し込み後に表示される口座へ年会費${ANNUAL_FEE_YEN.toLocaleString()}円をお振込み。入金確認後に有効化します。`]
+              : ["2", "申込内容を確認して決済", "クレジットカードで月額980円。確認画面で内容を明示します。"],
             ["3", "LINE連携して通知を受け取る", "監視銘柄を登録すれば、その日の検知がLINEに届きます。"],
           ].map(([n, title, desc]) => (
             <div
@@ -190,12 +213,12 @@ export default async function PricingPage() {
           ))}
         </div>
         <div className="text-center mt-8">
-          {PAYMENTS_ENABLED ? (
+          {joinable ? (
             <Link
               href={ctaHref}
               className="bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-8 py-3.5 text-sm font-medium transition-colors"
             >
-              プレミアムに登録する
+              {ctaLabel}
             </Link>
           ) : (
             <span className="bg-[#f5f5f7] text-[#6e6e73] rounded-full px-8 py-3.5 text-sm font-medium cursor-default">

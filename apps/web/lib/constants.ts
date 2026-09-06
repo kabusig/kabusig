@@ -10,6 +10,22 @@ export const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? "admin@kabusig.com";
 // 新しい決済を導入したら Vercel env PAYMENTS_ENABLED=true で再開する。
 export const PAYMENTS_ENABLED = process.env.PAYMENTS_ENABLED === "true";
 
+// 銀行振込(年会費・前払い)での申込を受け付けるか
+export const BANK_TRANSFER_ENABLED =
+  process.env.BANK_TRANSFER_ENABLED === "true";
+// 年会費(税込・円)
+export const ANNUAL_FEE_YEN = Number(process.env.ANNUAL_FEE_YEN ?? "9800");
+// 振込先口座情報(公開してよい情報。個人口座番号をgitに残さないため env で設定)
+export const BANK_INFO = {
+  bankName: process.env.BANK_NAME ?? "",
+  branch: process.env.BANK_BRANCH ?? "",
+  accountType: process.env.BANK_ACCOUNT_TYPE ?? "普通",
+  accountNumber: process.env.BANK_ACCOUNT_NUMBER ?? "",
+  holder: process.env.BANK_ACCOUNT_HOLDER ?? "",
+};
+export const bankInfoConfigured = () =>
+  Boolean(BANK_INFO.bankName && BANK_INFO.accountNumber);
+
 // 全ページフッター・全通知に表示する固定免責文言(変更禁止)
 export const DISCLAIMER =
   "本サービスが提供する情報はテクニカル指標等の機械的な計算結果および公開情報であり、" +
