@@ -43,10 +43,11 @@ export async function startMembership(formData: FormData) {
 
   const { data: profile } = await admin
     .from("profiles")
-    .select("trial_used")
+    .select("trial_used, line_user_id")
     .eq("id", user!.id)
     .single();
   const trialUsed = Boolean(profile?.trial_used);
+  const lineLinked = Boolean(profile?.line_user_id);
 
   await admin.from("membership_orders").insert({
     user_id: user!.id,
@@ -56,8 +57,8 @@ export async function startMembership(formData: FormData) {
     pay_code: genPayCode(),
   });
 
-  // 初回のみ、その場で1週間有効にする
-  if (!trialUsed) {
+  // 初回かつLINE連携済みのときだけ、その場で1週間有効にする(不正防止)
+  if (!trialUsed && lineLinked) {
     const until = new Date(Date.now() + 7 * 86400000)
       .toISOString()
       .slice(0, 10);

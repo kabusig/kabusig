@@ -421,7 +421,8 @@
       "Bash(rm -f scripts/tmp-sync.mjs)",
       "Bash(git commit -q -m '受験ナビラボの引継資料を追加＋CLAUDE.mdに導線 *)",
       "Bash(git commit -q -m 'からだナビラボの引継資料を追加＋CLAUDE.mdに導線 *)",
-      "Bash(git -c credential.helper= -c credential.helper=manager push origin main)"
+      "Bash(git -c credential.helper= -c credential.helper=manager push origin main)",
+      "Bash(python -c \"import test_forbidden_words as t; t.test_no_forbidden_words_in_sources\\(\\); print\\('forbidden OK'\\)\")"
     ]
   }
 }

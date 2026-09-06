@@ -226,11 +226,28 @@ export default async function SubscribePage({
             無料お試し期間(1週間)は既にご利用済みです。お申し込み後に表示される
             口座へお振込みいただき、入金確認後に有効化されます。
           </div>
-        ) : (
+        ) : viewer.lineLinked ? (
           <div className="bg-[#e8f2ff] rounded-xl p-4 text-sm text-[#1d4e89]">
             <strong>お申し込みで、その場で1週間すぐに使えます。</strong>
             1週間のうちに年会費をお振込みください。未入金の場合は自動的に
             利用停止となります(無料お試しはお一人様1回限りです)。
+          </div>
+        ) : (
+          <div className="bg-[#e8f7ee] rounded-xl p-4 text-sm text-[#0a5a34] space-y-3">
+            <p>
+              <strong>1週間の無料お試しにはLINE連携が必要です</strong>
+              (不正利用防止のため)。連携すると、この場で1週間すぐに使えます。
+            </p>
+            <a
+              href="/api/line/login"
+              className="inline-block bg-[#06c755] hover:bg-[#05b34c] text-white rounded-full px-5 py-2.5 text-sm font-medium transition-colors"
+            >
+              LINEと連携してお試しを始める
+            </a>
+            <p className="text-[11px] text-[#0a5a34]/80">
+              ※LINE連携せずに下のボタンで申し込むこともできますが、その場合は
+              お試しは付かず、ご入金の確認後に有効化されます。
+            </p>
           </div>
         )}
 
@@ -254,7 +271,9 @@ export default async function SubscribePage({
             type="submit"
             className="w-full bg-[#0071e3] hover:bg-[#0077ed] text-white rounded-full px-6 py-3.5 text-sm font-medium transition-colors"
           >
-            {trialUsed ? "申し込む(振込先を表示)" : "申し込んで1週間使ってみる"}
+            {!trialUsed && viewer.lineLinked
+              ? "申し込んで1週間使ってみる"
+              : "申し込む(振込先を表示)"}
           </button>
           <p className="text-[11px] text-[#6e6e73] text-center">
             <Link href="/legal/tokushoho" className="text-[#0066cc] hover:underline">
