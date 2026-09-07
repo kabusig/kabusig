@@ -275,9 +275,9 @@ export default async function SubscribePage({
           </div>
         )}
 
-        {err === "name" && (
+        {err && (
           <p className="text-sm text-[#d70015] bg-[#fff0f0] rounded-xl p-3">
-            入力内容をご確認ください。
+            お申し込みに失敗しました。お手数ですが、時間をおいて再度お試しください。
           </p>
         )}
 

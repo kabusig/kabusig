@@ -67,9 +67,9 @@ export default async function AccountPage({
       )}
       {line === "error" && (
         <p className="text-sm text-[#d70015] bg-[#fff0f0] rounded-xl p-3">
-          LINE連携に失敗しました。この LINE
-          アカウントが既に別の会員と連携されている可能性があります。時間をおいて
-          再度お試しいただくか、お問い合わせください。
+          LINE連携に失敗しました。お手数ですが、時間をおいて再度お試しください。
+          (この LINE
+          アカウントが既に別の会員と連携済みの場合も連携できません。)
         </p>
       )}
 

@@ -6,7 +6,8 @@ export async function GET(request: Request) {
   // コールバックはLINE登録の公開URLと完全一致が必要。実際のアクセス先ホスト名
   // (kabusig.com)から組み立てる(Vercel内部URLや環境変数のズレを避ける)
   const host = request.headers.get("host") || "kabusig.com";
-  const base = `${host.includes("localhost") ? "http" : "https"}://${host}`;
+  const isLocal = /localhost|127\.0\.0\.1/.test(host);
+  const base = `${isLocal ? "http" : "https"}://${host}`;
   const supabase = await createClient();
   const {
     data: { user },
@@ -26,7 +27,7 @@ export async function GET(request: Request) {
   );
   res.cookies.set("line_state", state, {
     httpOnly: true,
-    secure: !host.includes("localhost"),
+    secure: !isLocal,
     sameSite: "lax",
     maxAge: 600,
     path: "/",

@@ -49,13 +49,23 @@ export async function startMembership(formData: FormData) {
   const trialUsed = Boolean(profile?.trial_used);
   const lineLinked = Boolean(profile?.line_user_id);
 
-  await admin.from("membership_orders").insert({
-    user_id: user!.id,
-    transfer_name: name || null,
-    amount: ANNUAL_FEE_YEN,
-    status: "pending",
-    pay_code: genPayCode(),
-  });
+  // pending 内で pay_code が一意になるよう、衝突(23505)時はコードを振り直して再試行
+  let inserted = false;
+  for (let i = 0; i < 6; i++) {
+    const { error } = await admin.from("membership_orders").insert({
+      user_id: user!.id,
+      transfer_name: name || null,
+      amount: ANNUAL_FEE_YEN,
+      status: "pending",
+      pay_code: genPayCode(),
+    });
+    if (!error) {
+      inserted = true;
+      break;
+    }
+    if (error.code !== "23505") break; // 一意制約違反以外は再試行しない
+  }
+  if (!inserted) redirect("/subscribe?err=retry");
 
   // 初回かつLINE連携済みのときだけ、その場で1週間有効にする(不正防止)
   if (!trialUsed && lineLinked) {

@@ -8,7 +8,8 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   // 認可時と同じredirect_uriが必要。同じくホスト名から組み立てる
   const host = request.headers.get("host") || "kabusig.com";
-  const origin = `${host.includes("localhost") ? "http" : "https"}://${host}`;
+  const isLocal = /localhost|127\.0\.0\.1/.test(host);
+  const origin = `${isLocal ? "http" : "https"}://${host}`;
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const cookieStore = await cookies();
@@ -56,6 +57,10 @@ export async function GET(request: Request) {
     return done("/account?line=error");
   }
   const { userId: lineUserId } = await profileRes.json();
+  // 200 でも userId が取れない場合(仕様変更・スコープ不足等)は失敗として扱う
+  if (!lineUserId) {
+    return done("/account?line=error");
+  }
 
   const admin = createAdminClient();
   const { error: linkErr } = await admin
