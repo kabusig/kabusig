@@ -32,11 +32,11 @@ async function setPassword(formData: FormData) {
 export default async function AccountPage({
   searchParams,
 }: {
-  searchParams: Promise<{ pw?: string }>;
+  searchParams: Promise<{ pw?: string; line?: string }>;
 }) {
   const viewer = await getViewer();
   if (!viewer.loggedIn) redirect("/login");
-  const { pw } = await searchParams;
+  const { pw, line } = await searchParams;
 
   // 確認待ちの振込申込があるか(お振込みのお願いを表示)
   let hasPendingOrder = false;
@@ -59,6 +59,19 @@ export default async function AccountPage({
   return (
     <div className="max-w-lg mx-auto py-8 space-y-6">
       <h1 className="text-3xl font-semibold tracking-tight">アカウント</h1>
+
+      {line === "linked" && (
+        <p className="text-sm text-[#0a7d43] bg-[#e6f7ee] rounded-xl p-3">
+          LINE連携が完了しました。
+        </p>
+      )}
+      {line === "error" && (
+        <p className="text-sm text-[#d70015] bg-[#fff0f0] rounded-xl p-3">
+          LINE連携に失敗しました。この LINE
+          アカウントが既に別の会員と連携されている可能性があります。時間をおいて
+          再度お試しいただくか、お問い合わせください。
+        </p>
+      )}
 
       {hasPendingOrder && (
         <Link

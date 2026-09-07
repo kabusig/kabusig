@@ -14,15 +14,22 @@ export async function GET(request: Request) {
   const cookieStore = await cookies();
   const savedState = cookieStore.get("line_state")?.value;
 
+  // どのパスで終わっても state Cookie を破棄する(再利用防止)
+  const done = (path: string) => {
+    const r = NextResponse.redirect(`${origin}${path}`);
+    r.cookies.delete("line_state");
+    return r;
+  };
+
   if (!code || !state || state !== savedState) {
-    return NextResponse.redirect(`${origin}/account?line=error`);
+    return done("/account?line=error");
   }
 
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return NextResponse.redirect(`${origin}/login`);
+  if (!user) return done("/login");
 
   // アクセストークン取得
   const tokenRes = await fetch("https://api.line.me/oauth2/v2.1/token", {
@@ -37,7 +44,7 @@ export async function GET(request: Request) {
     }),
   });
   if (!tokenRes.ok) {
-    return NextResponse.redirect(`${origin}/account?line=error`);
+    return done("/account?line=error");
   }
   const { access_token } = await tokenRes.json();
 
@@ -46,17 +53,19 @@ export async function GET(request: Request) {
     headers: { Authorization: `Bearer ${access_token}` },
   });
   if (!profileRes.ok) {
-    return NextResponse.redirect(`${origin}/account?line=error`);
+    return done("/account?line=error");
   }
   const { userId: lineUserId } = await profileRes.json();
 
   const admin = createAdminClient();
-  await admin
+  const { error: linkErr } = await admin
     .from("profiles")
     .update({ line_user_id: lineUserId })
     .eq("id", user.id);
+  // 他アカウントで連携済み(line_user_id の unique 制約違反)等は失敗として扱う
+  if (linkErr) {
+    return done("/account?line=error");
+  }
 
-  const res = NextResponse.redirect(`${origin}/account?line=linked`);
-  res.cookies.delete("line_state");
-  return res;
+  return done("/account?line=linked");
 }

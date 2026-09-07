@@ -9,16 +9,17 @@ language plpgsql
 security definer
 as $$
 declare
+  oid bigint;
   uid uuid;
   new_until date;
 begin
-  select user_id into uid
+  select id, user_id into oid, uid
   from membership_orders
   where pay_code = code and status = 'pending'
   order by created_at desc
   limit 1;
 
-  if uid is null then
+  if oid is null then
     return '該当なし(pending): ' || code;
   end if;
 
@@ -30,9 +31,10 @@ begin
   where id = uid
   returning paid_until into new_until;
 
+  -- 特定した1件だけを確認済みにする(コード衝突時の巻き込み防止)
   update membership_orders
   set status = 'confirmed', confirmed_at = now()
-  where pay_code = code and status = 'pending';
+  where id = oid;
 
   return '確認完了: ' || uid || ' / 有効期限 ' || new_until;
 end;

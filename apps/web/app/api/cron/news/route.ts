@@ -54,13 +54,12 @@ function autoTags(title: string, defaults: string[]): string[] {
 }
 
 export async function GET(request: Request) {
-  // Vercel Cron の認証(CRON_SECRET 設定時)
+  // Vercel Cron の認証(CRON_SECRET 必須。未設定・不一致は拒否=フェイルクローズ)
+  // Vercel は CRON_SECRET を設定すると Cron 実行時に自動で Authorization に付与する。
   const secret = process.env.CRON_SECRET;
-  if (secret) {
-    const auth = request.headers.get("authorization");
-    if (auth !== `Bearer ${secret}`) {
-      return new Response("Unauthorized", { status: 401 });
-    }
+  const auth = request.headers.get("authorization");
+  if (!secret || auth !== `Bearer ${secret}`) {
+    return new Response("Unauthorized", { status: 401 });
   }
 
   const parser = new Parser({ timeout: 15000 });

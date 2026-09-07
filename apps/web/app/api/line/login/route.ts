@@ -26,6 +26,8 @@ export async function GET(request: Request) {
   );
   res.cookies.set("line_state", state, {
     httpOnly: true,
+    secure: !host.includes("localhost"),
+    sameSite: "lax",
     maxAge: 600,
     path: "/",
   });
