@@ -163,10 +163,14 @@ export default async function SubscribePage({
             </h1>
             {trialActive ? (
               <p className="text-sm text-[#6e6e73]">
-                お試し期限は{" "}
+                今すぐ全機能をお使いいただけます。お試し期限は{" "}
                 <strong className="text-[#1d1d1f]">{viewer.paidUntil}</strong>{" "}
-                までです。この期限までに下記口座へ年会費をお振込みください。
-                入金確認後、有効期限を1年間に延長します。
+                まで。この期限までに下記口座へ年会費{" "}
+                <strong className="text-[#1d1d1f]">
+                  {(pending.amount ?? ANNUAL_FEE_YEN).toLocaleString()}円
+                </strong>{" "}
+                をお振込みください。入金確認後、有効期限を1年間に延長します。
+                お振込みがない場合は期限で自動的に終了します。
               </p>
             ) : (
               <p className="text-sm text-[#6e6e73]">
@@ -195,23 +199,39 @@ export default async function SubscribePage({
 
     // 2-c) 新規申込フォーム
     const fee = ANNUAL_FEE_YEN.toLocaleString();
+    const perMonth = Math.round(ANNUAL_FEE_YEN / 12).toLocaleString();
     return (
       <div className="max-w-lg mx-auto py-8 space-y-6">
-        <div className="text-center space-y-2">
-          <h1 className="text-3xl font-semibold tracking-tight">
-            プレミアム年会費のお申し込み
+        <div className="text-center space-y-3">
+          <div className="text-xs font-medium text-[#b25000] bg-[#fff3e0] rounded-full px-4 py-1.5 inline-block">
+            プレミアム年会費プラン
+          </div>
+          <h1 className="text-3xl font-semibold tracking-tight text-balance">
+            相場を「事実」で見る、すべての機能を。
           </h1>
-          <p className="text-sm text-[#6e6e73]">
-            銀行振込による年額プランです。1回のお振込みで1年間ご利用いただけます。
+          <p className="text-sm text-[#6e6e73] leading-relaxed">
+            東証プライム全銘柄 × 33種のシグナルを毎日チェック。検知だけでなく
+            「その後どう動いたか」の実績と統計まで、プレミアムで全部見られます。
+            銀行振込の年額プランなら、1回のお支払いで1年間ご利用いただけます。
           </p>
         </div>
 
         <div className="bg-white rounded-2xl border border-black/5 shadow-sm p-6 space-y-4">
           <div className="text-center">
-            <span className="text-4xl font-semibold tracking-tight">{fee}</span>
-            <span className="text-[#6e6e73] ml-1.5">円 / 年(税込)</span>
+            <div>
+              <span className="text-4xl font-semibold tracking-tight">{fee}</span>
+              <span className="text-[#6e6e73] ml-1.5">円 / 年(税込)</span>
+            </div>
+            <div className="text-xs text-[#6e6e73] mt-1">
+              1日あたり約{Math.round(ANNUAL_FEE_YEN / 365)}円・月あたり約{perMonth}円
+            </div>
+            {!trialUsed && viewer.lineLinked && (
+              <div className="text-xs font-medium text-[#0a7d43] bg-[#e6f7ee] rounded-full px-3 py-1 inline-block mt-3">
+                🎁 いまなら1週間無料でお試し
+              </div>
+            )}
           </div>
-          <ul className="text-sm text-[#424245] space-y-1.5">
+          <ul className="text-sm text-[#424245] space-y-1.5 border-t border-black/5 pt-4">
             {BENEFITS.map((b) => (
               <li key={b} className="flex gap-2">
                 <span className="text-[#0071e3]">✓</span>
@@ -219,6 +239,10 @@ export default async function SubscribePage({
               </li>
             ))}
           </ul>
+          <p className="text-[11px] text-[#6e6e73] border-t border-black/5 pt-3">
+            解約はいつでも可能(更新しなければ有効期限で自動終了)。日割返金はありません。
+            表示情報は投資助言ではなく、投資判断はご自身の責任で行ってください。
+          </p>
         </div>
 
         {trialUsed ? (
