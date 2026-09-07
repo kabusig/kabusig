@@ -26,8 +26,12 @@ function formatDetail(rest: Record<string, number>): string {
   return Object.entries(rest)
     .map(([k, v]) => {
       const label = DETAIL_LABELS[k] ?? k;
-      const num =
-        Math.abs(v) >= 100 ? Math.round(v).toLocaleString() : v.toFixed(2);
+      const n = typeof v === "number" ? v : Number(v);
+      const num = !Number.isFinite(n)
+        ? String(v)
+        : Math.abs(n) >= 100
+          ? Math.round(n).toLocaleString()
+          : n.toFixed(2);
       const unit = k === "kairi25" ? "%" : k === "volume_ratio20" ? "倍" : "";
       return `${label} ${num}${unit}`;
     })
@@ -38,13 +42,16 @@ function parseDetail(raw: string | null): {
   close: number | null;
   rest: Record<string, number>;
 } {
-  let detail: Record<string, number> = {};
+  let parsed: unknown = {};
   try {
-    detail = JSON.parse(raw ?? "{}");
+    parsed = JSON.parse(raw ?? "{}");
   } catch {}
-  const { close = null, ...rest } = detail as Record<string, number> & {
-    close?: number;
-  };
+  // JSON が null や配列・数値等でも安全に扱う(object でなければ空扱い)
+  const detail =
+    parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? (parsed as Record<string, number> & { close?: number })
+      : {};
+  const { close = null, ...rest } = detail;
   return { close, rest };
 }
 

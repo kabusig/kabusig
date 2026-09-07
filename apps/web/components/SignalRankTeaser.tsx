@@ -73,7 +73,8 @@ export default function SignalRankTeaser({
                     locked ? "blur-sm select-none" : ""
                   }`}
                 >
-                  {s.signal_name}
+                  {/* 会員限定行は本当のシグナル名を送らない(ソース閲覧での漏洩防止) */}
+                  {locked ? "会員限定シグナル" : s.signal_name}
                 </span>
                 {locked ? (
                   <span className="text-sm text-[#6e6e73] shrink-0">

@@ -425,7 +425,8 @@
       "Bash(python -c \"import test_forbidden_words as t; t.test_no_forbidden_words_in_sources\\(\\); print\\('forbidden OK'\\)\")",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" https://kabusig.com/api/cron/news)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" https://kabusig.com/api/cron/batch)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -H \"authorization: Bearer wrong\" https://kabusig.com/api/cron/news)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -H \"authorization: Bearer wrong\" https://kabusig.com/api/cron/news)",
+      "Bash(xargs echo \"「会員限定シグナル」プレースホルダの数:\")"
     ]
   }
 }
